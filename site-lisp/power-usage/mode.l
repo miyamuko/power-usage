@@ -46,6 +46,9 @@
 (defvar *power-usage-mode-line-format* "~A/~A万kW:~D%~:[~;:計画停電実施中~]"
   "モードラインに表示するフォーマット (引数は消費電力、最大電力、使用率、計画停電実施中かどうか）")
 
+(defvar *power-usage-status-format* "~A/~A万kW (~4,1F%) 計画停電:~:[実施なし~;実施中~] 最終更新:~A"
+  "モードラインに表示するフォーマット (引数は消費電力、最大電力、使用率、計画停電実施中かどうか、最終更新）")
+
 (defvar *power-usage-mode* nil)
 (defvar *mode-line* nil)
 
@@ -71,10 +74,27 @@
                       100.0))
             (power-saving-p u))))
 
+(defun power-usage-long-status (&optional (u *last-power-usage*))
+  (when u
+    (format nil *power-usage-status-format*
+            (power-usage u)
+            (power-capacity u)
+            (* (/ (power-usage u)
+                  (power-capacity u))
+               100.0)
+            (power-saving-p u)
+            (power-entryfor u))))
+
 (defun update-mode-line-status ()
   (interactive)
-  (setf *mode-line* (power-usage-status))
-  (update-mode-line t))
+  (let ((status (power-usage-status))
+        (long-status (power-usage-long-status)))
+    (when status
+      (setf *mode-line* (power-usage-status))
+      (update-mode-line t)
+      (refresh-screen))
+    (when long-status
+      (message long-status))))
 
 (add-hook '*power-usage-update-hook* 'update-mode-line-status)
 
