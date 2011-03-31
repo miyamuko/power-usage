@@ -1,5 +1,8 @@
 2011-03-31  MIYAMUKO Katsuyuki
 
+	* (power-usage-status): 電力消費率が Yahoo の表示と一致するように
+	四捨五入を切り捨てに変更した。
+
 	* (update-power-usage): ミニバッファから手動で更新できるように
 	interactive にした。
 

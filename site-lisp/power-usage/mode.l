@@ -66,7 +66,7 @@
     (format nil *power-usage-mode-line-format*
             (power-usage u)
             (power-capacity u)
-            (round (* (/ (power-usage u)
+            (floor (* (/ (power-usage u)
                          (power-capacity u))
                       100.0))
             (power-saving-p u))))
