@@ -65,6 +65,7 @@
                                   :nomsg t :since :epoch)))
 
 (defun update-power-usage ()
+  (interactive)
   (xhr:xhr-get-async *power-usage-api-endpoint*
                      :nomsg t :since :epoch
                      :onsuccess 'end-update-power-usage))

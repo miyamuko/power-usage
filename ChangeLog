@@ -1,5 +1,8 @@
 2011-03-31  MIYAMUKO Katsuyuki
 
+	* (update-power-usage): ミニバッファから手動で更新できるように
+	interactive にした。
+
 	* capacity_peak_period に対応
 
 2011-03-30  MIYAMUKO Katsuyuki
