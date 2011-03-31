@@ -1,5 +1,13 @@
 2011-03-31  MIYAMUKO Katsuyuki
 
+	* (list-power-usage-at): 指定した月または日の毎時の電力使用状況を返す API を追加。
+
+	* (list-latest-power-usage): 今月の毎時の電力使用状況を返す API を追加。
+
+	* (get-power-usage-at): 指定された日時の電力使用状況を返す API を追加。
+
+	* (get-power-usage): get-latest-power-usage に変更した。
+
 	* (power-usage-status): 電力消費率が Yahoo の表示と一致するように
 	四捨五入を切り捨てに変更した。
 
