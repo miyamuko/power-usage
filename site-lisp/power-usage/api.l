@@ -53,6 +53,8 @@
   entryfor                      ; この時刻の文字列（UTC）
   capacity                      ; 供給可能最大電力（万kW）
   capacity-updated              ; 供給可能最大電力が決定された日時（UTC）
+  capacity-peak-period          ; 最大の供給能力を発揮する予定の時刻（24時間制、日本時間）。
+                                ; つまり、揚水発電を使って一時的に最大能力を発揮する時刻です。
   usage                         ; この時刻の消費電力（万kW）
   usage-updated                 ; この消費電力のデータが更新された日時（UTC）
   saving-p                      ; この時刻に計画停電が実施されていれば t
@@ -81,6 +83,7 @@
                   :entryfor ($ json :entryfor)
                   :capacity ($ json :capacity)
                   :capacity-updated ($ json :capacity_updated)
+                  :capacity-peak-period ($ json :capacity_peak_period)
                   :usage ($ json :usage)
                   :usage-updated ($ json :usage_updated)
                   :saving-p ($ json :saving)))))
