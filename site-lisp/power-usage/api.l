@@ -40,6 +40,17 @@
           list-latest-power-usage
           list-power-usage-at
           update-power-usage
+
+          ;; struct
+          power-datetime
+          power-entryfor
+          power-capacity
+          power-capacity-updated
+          power-capacity-peak-period
+          power-usage
+          power-usage-updated
+          power-saving-p
+          power-p
           ))
 
 (defvar *power-usage-api-endpoint* "http://tepco-usage-api.appspot.com"
