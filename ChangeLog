@@ -1,5 +1,7 @@
 2011-04-04  MIYAMUKO Katsuyuki
 
+	* power-uasge 1.0.0 リリース
+
 	* ni-autoload で自動的に power-usage-mode を有効にするようにした
 
 	* power 構造体のアクセッサをすべて export

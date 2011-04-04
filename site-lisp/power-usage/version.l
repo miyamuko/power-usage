@@ -34,7 +34,7 @@
 (export '(power-usage-version
           ))
 
-(defconstant +power-usage-version+ "0.0.1")
+(defconstant +power-usage-version+ "1.0.0")
 
 (defun power-usage-version ()
   +power-usage-version+)
