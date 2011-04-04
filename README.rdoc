@@ -8,7 +8,7 @@
 
 1. *power-usage-update-interval* で監視間隔を設定 (デフォルトは 1 時間)
 2. *power-usage-mode-line-format* でモードラインをお好みで設定
-3. M-x power-usage-mode でモードラインに表示
+3. M-x power-usage-mode でモードラインへの表示をトグル
 
 === DESCRIPTION
 
@@ -18,12 +18,13 @@ xyzzy のモードラインに表示します。
 === INSTALL
 
 1. {NetInstaller}[http://www7a.biglobe.ne.jp/~hat/xyzzy/ni.html]
-   で power-usage, foo, bar をインストールします。
+   で power-usage, xml-http-request, json をインストールします。
 
 2. ni-autoload を利用していない場合は、
    ~/.xyzzy または site-lisp/siteinit.l に以下のコードを追加します。
 
      (require "power-usage")
+     (power-usage:power-usage-mode t)
 
    ※ ni-autoload を利用している場合は設定は不要です。
 
