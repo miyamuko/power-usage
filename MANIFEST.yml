@@ -10,6 +10,10 @@ sources:
 document:
   - README.rdoc
 
+depends:
+  - xml-http-request
+  - json
+
 files:
   include:
     - site-lisp/**/*.l
