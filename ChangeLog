@@ -1,5 +1,7 @@
 2011-04-04  MIYAMUKO Katsuyuki
 
+	* ni-autoload で自動的に power-usage-mode を有効にするようにした
+
 	* power 構造体のアクセッサをすべて export
 
 	* (power-usage-long-status): 日付を UTC で表示していたのを修正

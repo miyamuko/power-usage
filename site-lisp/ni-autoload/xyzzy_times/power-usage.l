@@ -24,5 +24,6 @@
 ;; WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (require "power-usage")
+(power-usage:power-usage-mode t)
 
 ;;; End
