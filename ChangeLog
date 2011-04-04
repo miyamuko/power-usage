@@ -1,3 +1,8 @@
+2011-04-04  MIYAMUKO Katsuyuki
+
+	* (power-usage-long-status): 日付を UTC で表示していたのを修正
+	http://juria.posterous.com/power-usagexyzzy
+
 2011-03-31  MIYAMUKO Katsuyuki
 
 	* (update-mode-line-status, power-usage-long-status): update-power-usage
