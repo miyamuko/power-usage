@@ -1,7 +1,7 @@
 == power-usage - 東京電力の電力供給量をモードラインに表示
 
 * Home URL: http://miyamuko.s56.xrea.com/xyzzy/power-usage-mode/intro.htm
-* Version: 1.0.0
+* Version: 1.1.0
 
 
 === SYNOPSIS
