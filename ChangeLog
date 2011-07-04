@@ -1,5 +1,11 @@
 2011-07-04  MIYAMUKO Katsuyuki
 
+	* Yahoo 電力使用状況 API を利用して東北と関西の電力使用状況に対応
+	(setf *power-usage-area* :kansai)
+	(setf *power-usage-area* :tohoku)
+	(setf *power-usage-area* :tokyo)
+	http://developer.yahoo.co.jp/webapi/shinsai/setsuden/v1/latestpowerusage.html
+
 	* tepco-usage-api 依存部分を api/tepco-usage-api.l に分離
 
 2011-04-04  MIYAMUKO Katsuyuki

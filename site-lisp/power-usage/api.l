@@ -28,6 +28,7 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (require "power-usage/package")
   (require "power-usage/api/tepco-usage-api")
+  (require "power-usage/api/yahoo-setsuden-api")
   )
 
 (in-package :power-usage)
