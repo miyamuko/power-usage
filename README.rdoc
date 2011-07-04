@@ -6,9 +6,9 @@
 
 === SYNOPSIS
 
-1. <tt>*power-usage-area*</tt> で地域を指定 (:tokyo, :kansai, :tohoku)
-2. <tt>*power-usage-update-interval*</tt> で監視間隔を設定 (デフォルトは 1 時間)
-3. <tt>*power-usage-mode-line-format*</tt> でモードラインをお好みで設定
+1. <tt>\*power-usage-area*</tt> で地域を指定 (:tokyo, :kansai, :tohoku)
+2. <tt>\*power-usage-update-interval*</tt> で監視間隔を設定 (デフォルトは 1 時間)
+3. <tt>\*power-usage-mode-line-format*</tt> でモードラインをお好みで設定
 4. <tt>M-x power-usage-mode</tt> でモードラインへの表示をトグル
 
 === DESCRIPTION
