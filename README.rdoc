@@ -6,14 +6,19 @@
 
 === SYNOPSIS
 
-1. *power-usage-update-interval* で監視間隔を設定 (デフォルトは 1 時間)
-2. *power-usage-mode-line-format* でモードラインをお好みで設定
-3. M-x power-usage-mode でモードラインへの表示をトグル
+1. *power-usage-area* で地域を指定 (:tokyo, :kansai, :tohoku)
+2. *power-usage-update-interval* で監視間隔を設定 (デフォルトは 1 時間)
+3. *power-usage-mode-line-format* でモードラインをお好みで設定
+4. M-x power-usage-mode でモードラインへの表示をトグル
 
 === DESCRIPTION
 
-power-usage は http://tepco-usage-api.appspot.com/ から取得した電力消費量を
+power-usage は東京電力、東北電力、関西電力の電力使用状況を
 xyzzy のモードラインに表示します。
+
+東京電力の場合 http://tepco-usage-api.appspot.com/ から取得し、
+東北電力、関西電力の場合は http://developer.yahoo.co.jp/webapi/shinsai/setsuden/v1/latestpowerusage.html
+から取得します。
 
 === INSTALL
 
@@ -24,6 +29,12 @@ xyzzy のモードラインに表示します。
    ~/.xyzzy または site-lisp/siteinit.l に以下のコードを追加します。
 
      (require "power-usage")
+     ;; 東京電力 (デフォルト)
+     ; (setf power-usage:*power-usage-area* :tokyo)
+     ;; 関西電力
+     ; (setf power-usage:*power-usage-area* :kansai)
+     ;; 東北電力
+     ; (setf power-usage:*power-usage-area* :tohoku)
      (power-usage:power-usage-mode t)
 
    ※ ni-autoload を利用している場合は設定は不要です。
