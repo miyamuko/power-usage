@@ -1,3 +1,7 @@
+2011-07-04  MIYAMUKO Katsuyuki
+
+	* tepco-usage-api 依存部分を api/tepco-usage-api.l に分離
+
 2011-04-04  MIYAMUKO Katsuyuki
 
 	* power-uasge 1.0.0 リリース
