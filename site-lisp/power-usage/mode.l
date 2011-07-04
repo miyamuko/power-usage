@@ -41,8 +41,8 @@
           stop-power-usage-watcher
           ))
 
-(defvar *power-usage-update-interval* (* 10 60)
-  "自動更新の間隔 (デフォルト: 1 時間)")
+(defvar *power-usage-update-interval* (* 10 30)
+  "自動更新の間隔 (デフォルト: 30 分)")
 
 (defvar *power-usage-mode-line-format* "~A/~A万kW:~D%~:[~;:計画停電実施中~]"
   "モードラインに表示するフォーマット (引数は消費電力、最大電力、使用率、計画停電実施中かどうか）")
