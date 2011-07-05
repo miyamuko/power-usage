@@ -1,5 +1,8 @@
 2011-07-05  MIYAMUKO Katsuyuki
 
+	* (get-latest-power-usage, get-power-usage-at, list-latest-power-usage)
+	(list-power-usage-at, update-power-usage): 引数に地域を指定できるようにした
+
 	* (list-latest-power-usage, list-power-usage-at): 関西と東北の場合、
 	未サポートエラーを通知するようにした
 

@@ -69,50 +69,47 @@
   "最後に取得した電力消費量 (power 構造体)")
 
 
-(defun get-latest-power-usage ()
+(defun get-latest-power-usage (&optional (area *power-usage-area*))
   "最新の電力使用状況を返します。"
-  (get-power-usage-at nil nil nil nil))
+  (get-power-usage-at nil nil nil nil area))
 
-(defun get-power-usage-at (year month day hour)
+(defun get-power-usage-at (year month day hour &optional (area *power-usage-area*))
   "指定された日時の電力使用状況を返します。"
-  (let ((area *power-usage-area*))
-    (json->struct area
-                  (xhr:xhr-get (build-api-endpoint area year month day hour)
-                               :key 'response-json
-                               :nomsg t :since :epoch))))
+  (json->struct area
+                (xhr:xhr-get (build-api-endpoint area year month day hour)
+                             :key 'response-json
+                             :nomsg t :since :epoch)))
 
 
-(defun list-latest-power-usage ()
+(defun list-latest-power-usage (&optional (area *power-usage-area*))
   "今月の毎時の電力使用状況を、リストとして返します。"
   (multiple-value-bind (_ _ _ _ month year _)
       (decode-universal-time (get-universal-time))
-    (list-power-usage-at year month)))
+    (list-power-usage-at year month nil area)))
 
-(defun list-power-usage-at (year month &optional day)
+(defun list-power-usage-at (year month &optional day (area *power-usage-area*))
   "指定された月または日の毎時の電力使用状況を、リストとして返します。"
-  (let ((area *power-usage-area*))
-    (mapcar #'(lambda (json)
-                (json->struct area json))
-            (xhr:xhr-get (build-api-endpoint year month day)
-                         :key 'response-json
-                         :nomsg t :since :epoch))))
+  (mapcar #'(lambda (json)
+              (json->struct area json))
+          (xhr:xhr-get (build-api-endpoint area year month day)
+                       :key 'response-json
+                       :nomsg t :since :epoch)))
 
 
-(defun update-power-usage ()
+(defun update-power-usage (&optional (area *power-usage-area*))
   "非同期で最新の電力使用状況を更新します。
 更新後は *last-power-usage* に値が設定され、
 *power-usage-update-hook* が呼ばれます。"
   (interactive)
-  (let ((area *power-usage-area*))
-    (xhr:xhr-get-async (build-api-endpoint area)
-                       :nomsg t :since :epoch
-                       :key 'response-json
-                       :onsuccess 'end-update-power-usage)))
+  (xhr:xhr-get-async (build-api-endpoint area)
+                     :nomsg t :since :epoch
+                     :key 'response-json
+                     :onsuccess #'(lambda (json)
+                                    (end-update-power-usage area json))))
 
-(defun end-update-power-usage (json)
-  (let ((area *power-usage-area*))
-    (setf *last-power-usage* (json->struct area json))
-    (run-hooks '*power-usage-update-hook*)))
+(defun end-update-power-usage (area json)
+  (setf *last-power-usage* (json->struct area json))
+  (run-hooks '*power-usage-update-hook*))
 
 
 (provide "power-usage/api")
