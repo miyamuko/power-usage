@@ -1,3 +1,8 @@
+2011-07-05  MIYAMUKO Katsuyuki
+
+	* (list-latest-power-usage, list-power-usage-at): 関西と東北の場合、
+	未サポートエラーを通知するようにした
+
 2011-07-04  MIYAMUKO Katsuyuki
 
 	* power-uasge 1.1.0 リリース

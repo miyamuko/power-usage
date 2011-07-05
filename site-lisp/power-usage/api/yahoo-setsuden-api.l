@@ -71,9 +71,17 @@
   (let ((params `((:appid . ,*app-id*)
                   (:output . :json)
                   (:area . ,area))))
-    (when (and year month)
-      (push (cons :datetime (format nil "~4,'0D~2,'0D~2,'0D~2,'0D" year month day hour))
-            params))
+    (cond ((every #'null (list year month day hour))
+           ;; 最新情報の取得
+           ;; datetime パラメータなし
+           )
+          ((every #'identity (list year month day hour))
+           ;; 日付時間指定
+           (push (cons :datetime (format nil "~4,'0D~2,'0D~2,'0D~2,'0D" year month day hour))
+                 params))
+          (t
+           ;; 月指定など
+           (error "Not supported.")))
     (xhr::add-query-params *api-endpoint* params)))
 
 (dolist (area '(:tohoku :kansai))
