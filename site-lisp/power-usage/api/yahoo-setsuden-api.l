@@ -85,9 +85,7 @@
     (xhr::add-query-params *api-endpoint* params)))
 
 (dolist (area '(:tohoku :kansai))
-  (add-extension area (make-extension
-                       :json->struct 'json->struct-impl
-                       :build-api-endpoint 'build-api-endpoint-impl)))
+  (add-extension area :power-usage.yahoo-setsuden-api))
 
 
 (provide "power-usage/api/yahoo-setsuden-api")

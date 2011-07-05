@@ -74,9 +74,7 @@
 (defun build-url (path)
   (format nil "~A/~A" *api-endpoint* path))
 
-(add-extension :tokyo (make-extension
-                       :json->struct 'json->struct-impl
-                       :build-api-endpoint 'build-api-endpoint-impl))
+(add-extension :tokyo :power-usage.tepco-usage-api)
 
 
 (provide "power-usage/api/tepco-usage-api")

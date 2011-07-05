@@ -77,25 +77,19 @@
   saving-p                      ; ‚±‚ÌŽž‚ÉŒv‰æ’â“d‚ªŽÀŽ{‚³‚ê‚Ä‚¢‚ê‚Î t
   )
 
-(defstruct extension
-  json->struct
-  build-api-endpoint)
-
-
 (defvar *extensions* nil)
 
 
-(defun add-extension (area extension)
-  (setf *extensions* (delete area *extensions*
-                             :test #'string= :key #'car))
-  (push (cons area extension) *extensions*))
+(defun add-extension (area pkg)
+  (setf *extensions* (delete pkg *extensions*))
+  (push (cons area pkg) *extensions*))
 
 (defun dispatch (fn area &rest args)
   (let ((ext (find area *extensions*
                    :test #'string= :key #'car)))
     (unless ext
       (error "~A ‚É‚Í‘Î‰ž‚µ‚Ä‚¢‚Ü‚¹‚ñB" area))
-    (apply (si:*slot-value (cdr ext) fn) area args)))
+    (apply (intern (string fn) (cdr ext)) area args)))
 
 
 (defun $ (json &rest keys)
@@ -105,10 +99,10 @@
           :initial-value json))
 
 (defun json->struct (area json)
-  (dispatch :json->struct area json))
+  (dispatch :json->struct-impl area json))
 
 (defun build-api-endpoint (area &optional year month day hour)
-  (dispatch :build-api-endpoint area year month day hour))
+  (dispatch :build-api-endpoint-impl area year month day hour))
 
 (defun response-json (res)
   (multiple-value-bind (text status _)
