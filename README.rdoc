@@ -1,6 +1,6 @@
 == power-usage - 東京電力・東北電力・関西電力の電力使用状況をモードラインに表示
 
-* Home URL: http://miyamuko.s56.xrea.com/xyzzy/power-usage-mode/intro.htm
+* Home URL: http://miyamuko.s56.xrea.com/xyzzy/power-usage/intro.htm
 * Version: 1.1.0
 
 
