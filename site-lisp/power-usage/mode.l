@@ -112,13 +112,19 @@
   (interactive "p")
   (ed::toggle-mode '*power-usage-mode* arg sv)
   (cond (*power-usage-mode*
-         (start-power-usage-watcher)
-         (update-mode-line-status))
+         ;; 通信中にダンプされないようにタイマで実行
+         (start-timer 0.1 'start-power-usage-watcher t))
         (t
          (stop-power-usage-watcher)
          (update-mode-line t))))
 
 (pushnew '(*power-usage-mode* . *mode-line*) ed:*minor-mode-alist* :key #'car)
+
+;; ダンプからロードしたときにタイマを再開
+(defun restart-power-usage-mode ()
+  (when *power-usage-mode*
+    (start-power-usage-watcher)))
+(add-hook '*post-startup-hook* 'restart-power-usage-mode)
 
 
 (provide "power-usage/mode")
