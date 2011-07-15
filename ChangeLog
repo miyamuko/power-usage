@@ -1,5 +1,7 @@
 2011-07-15  MIYAMUKO Katsuyuki
 
+	* power-uasge 1.1.1 リリース
+
 	* ダンプからロードしたときに動かなくなっていたのを修正
 	https://github.com/miyamuko/power-usage/issues/1
 
