@@ -1,4 +1,4 @@
-== power-usage - 東京電力・東北電力・関西電力の電力使用状況をモードラインに表示
+== power-usage - 電力使用状況をモードラインに表示
 
 * Home URL: http://miyamuko.s56.xrea.com/xyzzy/power-usage/intro.htm
 * Version: 1.1.1
@@ -7,19 +7,20 @@
 === SYNOPSIS
 
 1. <tt>\*power-usage-area*</tt> で地域を指定 (:tokyo, :tohoku, :kansai, :chubu, :kyusyu)
-2. <tt>\*power-usage-update-interval*</tt> で監視間隔を設定 (デフォルトは 1 時間)
+2. <tt>\*power-usage-update-interval*</tt> で監視間隔を秒単位で設定 (デフォルトは 300 秒 (5 分))
 3. <tt>\*power-usage-mode-line-format*</tt> でモードラインをお好みで設定
 4. <tt>M-x power-usage-mode</tt> でモードラインへの表示をトグル
 
 === DESCRIPTION
 
-power-usage は東京電力・東北電力・関西電力の電力使用状況を
+power-usage は東京電力・東北電力・関西電力・中部電力・九州電力の電力使用状況を
 xyzzy のモードラインに表示します。
 
-東京電力の場合 http://tepco-usage-api.appspot.com/ から取得し、
-東北電力、関西電力、中部電力、九州電力の場合は
+最新のデータは
 http://developer.yahoo.co.jp/webapi/shinsai/setsuden/v1/latestpowerusage.html
 から取得します。
+
+過去のデータは http://tepco-usage-api.appspot.com/ から取得します（東京電力のみ）。
 
 === INSTALL
 

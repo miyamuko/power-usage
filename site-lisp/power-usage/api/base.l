@@ -44,23 +44,19 @@
           area-name
 
           $
-          json->struct
+          parse-response
           build-api-endpoint
+          response-text
           response-json
 
           ;; struct
           make-power
+          power-p
           power-area
           power-datetime
-          power-entryfor
           power-capacity
-          power-capacity-updated
-          power-capacity-peak-period
           power-usage
-          power-usage-updated
           power-usage-rate
-          power-saving-p
-          power-p
           ))
 
 (defstruct power
@@ -68,14 +64,6 @@
   datetime                      ; 年月日 (ユニバーサルタイム)
   capacity                      ; 供給可能最大電力（万kW）
   usage                         ; この時刻の消費電力（万kW）
-
-  ;; 以下は *power-usage-area* が :tokyo の場合のみに有効
-  entryfor                      ; この時刻の文字列（UTC）
-  capacity-updated              ; 供給可能最大電力が決定された日時（UTC）
-  capacity-peak-period          ; 最大の供給能力を発揮する予定の時刻（24時間制、日本時間）。
-                                ; つまり、揚水発電を使って一時的に最大能力を発揮する時刻です。
-  usage-updated                 ; この消費電力のデータが更新された日時（UTC）
-  saving-p                      ; この時刻に計画停電が実施されていれば t
   )
 
 ;; (((:<area-code> . "<area-name>") . :<package-name>) ...)
@@ -91,23 +79,28 @@
 
 ;; area -> (:<area-code> . "<area-name>")
 (defun add-extension (area pkg)
-  (setf *extensions* (delete pkg *extensions*))
-  (push (cons area pkg) *extensions*))
+  (let ((ext (cons area pkg)))
+    (setf *extensions* (delete ext *extensions* :test 'equalp))
+    (push ext *extensions*)))
 
 (defun area-name (area)
-  (let ((ext (find-extension area)))
-    (cdar ext)))
+  (let ((ext (find-extensions area)))
+    (cdaar ext)))
 
-(defun dispatch (fn area &rest args)
-  (let ((ext (find-extension area)))
-    (apply (intern (string fn) (cdr ext)) area args)))
+(defun dispatch (symbol area &rest args)
+  (dolist (ext (find-extensions area))
+    (let ((fn (intern (string symbol) (cdr ext))))
+      (when (fboundp fn)
+        (return-from dispatch (apply fn area args)))))
+  (error "~A には対応していません。" area))
 
-(defun find-extension (area)
-  (let ((ext (find area *extensions*
-                   :test #'string= :key #'caar)))
-    (unless ext
+(defun find-extensions (area)
+  (let ((exts (remove-if-not #'(lambda (ext)
+                                (string= (caar ext) area))
+                            *extensions*)))
+    (unless exts
       (error "~A には対応していません。" area))
-    ext))
+    exts))
 
 (defun $ (json &rest keys)
   (reduce #'(lambda (obj key)
@@ -115,18 +108,27 @@
           keys
           :initial-value json))
 
-(defun json->struct (area json)
-  (dispatch :json->struct-impl area json))
+(defun parse-response (area res &key datetime latest history)
+  (let ((fn (cond (history :parse-response-history)
+                  (latest :parse-response-latest)
+                  (t :parse-response-datetime))))
+    (dispatch fn area res)))
 
-(defun build-api-endpoint (area &optional year month day hour)
-  (dispatch :build-api-endpoint-impl area year month day hour))
+(defun build-api-endpoint (area &key datetime latest history)
+  (let ((fn (cond (history :build-api-endpoint-history)
+                  (latest :build-api-endpoint-latest)
+                  (t :build-api-endpoint-datetime))))
+    (dispatch fn area datetime)))
 
 (defun response-json (res)
+  (json:json-decode (response-text res)))
+
+(defun response-text (res)
   (multiple-value-bind (text status _)
       (xhr:xhr-response-values res)
     (unless (<= 200 status 299)
       (plain-error (format nil "~A ~A" status (xhr:xhr-status-text res))))
-    (json:json-decode text)))
+    text))
 
 
 (provide "power-usage/api/base")

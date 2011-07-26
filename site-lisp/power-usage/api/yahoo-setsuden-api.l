@@ -49,42 +49,44 @@
 
 (defvar *app-id* "yU3Fn0Gxg65IQELBxYmNuQiMvOp5mZ6X2TiK2dLKJqe0uGOsCEbclDPockhGRHQ-")
 
-(defun json->struct-impl (area json)
+(defun parse-response-latest (area res)
+  (parse-response-impl area (response-json res)))
+
+(defun parse-response-datetime (area res)
+  (parse-response-impl area (response-json res)))
+
+(defun parse-response-impl (area json)
   (when ($ json :ERROR)
     (error "Yahoo 電力使用状況 API の呼び出しに失敗しました: ~A" ($ json :ERROR :Message)))
   (let* ((usage ($ json :ElectricPowerUsage))
          (date (mapcar #'parse-integer (split-string ($ usage :Date) #\-)))
-         (hour ($ usage :Hour)))
+         (hour ($ usage :Hour))
+         (minutes ($ usage :Min)))
     (make-power :area area
                 :datetime (encode-universal-time
-                           0 0 hour
+                           0 (or minutes 0) hour
                            (third date) (second date) (first date))
                 :capacity (/ ($ usage :Capacity :$) 10000)   ; kW 固定
                 :usage (/ ($ usage :Usage :$) 10000)         ; kW 固定
-                :entryfor nil
-                :capacity-updated nil
-                :capacity-peak-period nil
-                :usage-updated nil
-                :saving-p nil)))
+                )))
 
-(defun build-api-endpoint-impl (area &optional year month day hour)
+(defun build-api-endpoint-latest (area datetime)
+  ;; 中部電力は latest=1 を未サポート
+  (build-api-endpoint-impl area (cons :latest (if (eq area :chubu) 0 1))))
+
+(defun build-api-endpoint-datetime (area datetime)
+  (let ((datetime-str (apply 'format nil "~4,'0D~2,'0D~2,'0D~2,'0D" datetime)))
+    (build-api-endpoint-impl area (cons :datetime datetime-str))))
+
+(defun build-api-endpoint-impl (area param)
   (let ((params `((:appid . ,*app-id*)
                   (:output . :json)
                   (:area . ,area))))
-    (cond ((every #'null (list year month day hour))
-           ;; 最新情報の取得
-           ;; datetime パラメータなし
-           )
-          ((every #'identity (list year month day hour))
-           ;; 日付時間指定
-           (push (cons :datetime (format nil "~4,'0D~2,'0D~2,'0D~2,'0D" year month day hour))
-                 params))
-          (t
-           ;; 月指定など
-           (error "Not supported.")))
+    (push param params)
     (xhr::add-query-params *api-endpoint* params)))
 
-(dolist (area '((:tohoku . "東北電力")
+(dolist (area '((:tokyo  . "東京電力")
+                (:tohoku . "東北電力")
                 (:kansai . "関西電力")
                 (:chubu  . "中部電力")
                 (:kyushu . "九州電力")

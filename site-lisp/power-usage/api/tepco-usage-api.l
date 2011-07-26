@@ -46,33 +46,26 @@
 (defvar *api-endpoint* "http://tepco-usage-api.appspot.com"
   "東京電力電力供給状況 API の URL")
 
-(defvar *api-latest-path* "latest.json"
-  "最新の電力使用状況を返す API のパス")
-
 (defvar *api-datetime-path* "~4,'0D/~2,'0D~@[/~2,'0D~]~@[/~2,'0D~].json"
   "指定した日付の電力使用状況を返す API のパス")
+
+(defun parse-response-history (area res)
+  (mapcar #'(lambda (json)
+              (json->struct-impl area json))
+          (response-json res)))
 
 (defun json->struct-impl (area json)
   (make-power :area area
               :datetime (encode-universal-time
                          0 0 ($ json :hour)
                          ($ json :day) ($ json :month) ($ json :year))
-              :entryfor ($ json :entryfor)
               :capacity ($ json :capacity)
-              :capacity-updated ($ json :capacity_updated)
-              :capacity-peak-period ($ json :capacity_peak_period)
               :usage ($ json :usage)
-              :usage-updated ($ json :usage_updated)
-              :saving-p ($ json :saving)))
+              ))
 
-(defun build-api-endpoint-impl (area &optional year month day hour)
-  (let ((path (if (and year month)
-                  (format nil *api-datetime-path* year month day hour)
-                *api-latest-path*)))
-    (build-url path)))
-
-(defun build-url (path)
-  (format nil "~A/~A" *api-endpoint* path))
+(defun build-api-endpoint-history (area datetime)
+  (let ((path (apply 'format nil *api-datetime-path* datetime)))
+    (format nil "~A/~A" *api-endpoint* path)))
 
 (add-extension '(:tokyo . "東京電力") :power-usage.tepco-usage-api)
 

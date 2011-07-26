@@ -44,16 +44,12 @@
           update-power-usage
 
           ;; struct
-          power-datetime
-          power-entryfor
-          power-capacity
-          power-capacity-updated
-          power-capacity-peak-period
-          power-usage
-          power-usage-updated
-          power-usage-rate
-          power-saving-p
           power-p
+          power-area
+          power-datetime
+          power-capacity
+          power-usage
+          power-usage-rate
           ))
 
 (defvar *power-usage-area* :tokyo
@@ -75,29 +71,22 @@
 
 (defun get-latest-power-usage (&optional (area *power-usage-area*))
   "最新の電力使用状況を返します。"
-  (get-power-usage-at nil nil nil nil area))
+  (get-power-usage area :latest t))
 
 (defun get-power-usage-at (year month day hour &optional (area *power-usage-area*))
   "指定された日時の電力使用状況を返します。"
-  (json->struct area
-                (xhr:xhr-get (build-api-endpoint area year month day hour)
-                             :key 'response-json
-                             :nomsg t :since :epoch)))
+  (get-power-usage area :datetime (list year month day hour)))
 
 
 (defun list-latest-power-usage (&optional (area *power-usage-area*))
   "今月の毎時の電力使用状況を、リストとして返します。"
   (multiple-value-bind (_ _ _ _ month year _)
       (decode-universal-time (get-universal-time))
-    (list-power-usage-at year month nil area)))
+    (get-power-usage area :datetime (list year month nil nil) :history t)))
 
 (defun list-power-usage-at (year month &optional day (area *power-usage-area*))
   "指定された月または日の毎時の電力使用状況を、リストとして返します。"
-  (mapcar #'(lambda (json)
-              (json->struct area json))
-          (xhr:xhr-get (build-api-endpoint area year month day)
-                       :key 'response-json
-                       :nomsg t :since :epoch)))
+  (get-power-usage area :datetime (list year month day nil) :history t))
 
 
 (defun update-power-usage (&optional (area *power-usage-area*))
@@ -105,15 +94,20 @@
 更新後は *last-power-usage* に値が設定され、
 *power-usage-update-hook* が呼ばれます。"
   (interactive)
-  (xhr:xhr-get-async (build-api-endpoint area)
+  (xhr:xhr-get-async (build-api-endpoint area :latest t)
                      :nomsg t :since :epoch
-                     :key 'response-json
-                     :onsuccess #'(lambda (json)
-                                    (end-update-power-usage area json))))
+                     :onsuccess #'(lambda (res)
+                                    (end-update-power-usage area res))))
 
-(defun end-update-power-usage (area json)
-  (setf *last-power-usage* (json->struct area json))
+(defun end-update-power-usage (area res)
+  (setf *last-power-usage* (parse-response area res :latest t))
   (run-hooks '*power-usage-update-hook*))
+
+
+(defun get-power-usage (area &key datetime latest history)
+  (let* ((endpoint (build-api-endpoint area :datetime datetime :latest latest :history history))
+         (res (xhr:xhr-get endpoint :nomsg t :since :epoch)))
+    (parse-response area res :datetime datetime :latest latest :history history)))
 
 
 (provide "power-usage/api")

@@ -1,5 +1,19 @@
 2011-07-26  MIYAMUKO Katsuyuki
 
+	* 最新情報の取得に対応 (#3)
+	- 東京電力の場合も Yahoo 電力使用状況 API を利用するように変更
+	- power 構造体から Yahoo API が対応していない以下のスロットを削除
+	  - :entryfor
+	  - :capacity-updated
+	  - :capacity-peak-period
+	  - :usage-updated
+	  - :saving-p
+	- *power-usage-mode-line-format*, *power-usage-datetime-format* から
+	  計画停電の情報を削除
+	- tepco-usage-api は list-latest-power-usage, list-power-usage-at
+	  のみで利用
+	- 自動更新の間隔のデフォルト値を変更: 30 分 => 5 分
+
 	* Yahoo 電力使用状況 API を利用して中部と九州の電力使用状況に対応 (#2)
 	(setf *power-usage-area* :chubu)
 	(setf *power-usage-area* :kyushu)

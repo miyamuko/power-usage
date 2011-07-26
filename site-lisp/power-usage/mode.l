@@ -41,16 +41,16 @@
           stop-power-usage-watcher
           ))
 
-(defvar *power-usage-update-interval* (* 10 30)
-  "自動更新の間隔 (デフォルト: 30 分)")
+(defvar *power-usage-update-interval* (* 5 60)
+  "自動更新の間隔を秒単位で指定 (デフォルト: 5 分)")
 
-(defvar *power-usage-mode-line-format* "~A/~A万kW:~D%~:[~;:計画停電実施中~]"
-  "モードラインに表示するフォーマット (引数は消費電力、最大電力、使用率、計画停電実施中かどうか）")
+(defvar *power-usage-mode-line-format* "~A/~A万kW:~D%"
+  "モードラインに表示するフォーマット (引数は消費電力、最大電力、使用率）")
 
-(defvar *power-usage-status-format* "~A/~A万kW (~4,1F%) ~A 計画停電:~:[実施なし~;実施中~] 時刻:~A"
-  "モードラインに表示するフォーマット (引数は消費電力、最大電力、使用率、地域、計画停電実施中かどうか、時刻）")
+(defvar *power-usage-status-format* "~A ~A ~A/~A万kW (~4,1F%)"
+  "モードラインに表示するフォーマット (引数は時刻、地域、消費電力、最大電力、使用率）")
 
-(defvar *power-usage-datetime-format* "%Y/%m/%d %H時台"
+(defvar *power-usage-datetime-format* "%Y/%m/%d %H:%M"
   "ステータスバーに表示する時刻")
 
 (defvar *power-usage-mode* nil)
@@ -74,17 +74,17 @@
             (power-usage u)
             (power-capacity u)
             (floor (power-usage-rate u))
-            (power-saving-p u))))
+            )))
 
 (defun power-usage-long-status (&optional (u *last-power-usage*))
   (when u
     (format nil *power-usage-status-format*
+            (format-date-string *power-usage-datetime-format* (power-datetime u))
+            (area-name (power-area u))
             (power-usage u)
             (power-capacity u)
             (power-usage-rate u)
-            (area-name (power-area u))
-            (power-saving-p u)
-            (format-date-string *power-usage-datetime-format* (power-datetime u)))))
+            )))
 
 (defun update-mode-line-status ()
   (interactive)
