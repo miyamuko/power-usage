@@ -51,6 +51,7 @@
           power-capacity-peak-period
           power-usage
           power-usage-updated
+          power-usage-rate
           power-saving-p
           power-p
           ))

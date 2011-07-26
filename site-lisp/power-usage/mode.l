@@ -78,9 +78,7 @@
     (format nil *power-usage-mode-line-format*
             (power-usage u)
             (power-capacity u)
-            (floor (* (/ (power-usage u)
-                         (power-capacity u))
-                      100.0))
+            (floor (power-usage-rate u))
             (power-saving-p u))))
 
 (defun power-usage-long-status (&optional (u *last-power-usage*))
@@ -88,9 +86,7 @@
     (format nil *power-usage-status-format*
             (power-usage u)
             (power-capacity u)
-            (* (/ (power-usage u)
-                  (power-capacity u))
-               100.0)
+            (power-usage-rate u)
             (cdr (assoc (power-area u) *area-name*))
             (power-saving-p u)
             (format-date-string *power-usage-datetime-format* (power-datetime u)))))

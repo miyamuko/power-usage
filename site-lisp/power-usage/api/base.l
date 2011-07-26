@@ -58,6 +58,7 @@
           power-capacity-peak-period
           power-usage
           power-usage-updated
+          power-usage-rate
           power-saving-p
           power-p
           ))
@@ -79,6 +80,13 @@
 
 (defvar *extensions* nil)
 
+
+(defun power-usage-rate (power)
+  (if (zerop (power-capacity power))
+      0
+    (* (/ (power-usage power)
+          (power-capacity power))
+       100.0)))
 
 (defun add-extension (area pkg)
   (setf *extensions* (delete pkg *extensions*))
