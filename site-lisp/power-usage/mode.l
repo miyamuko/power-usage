@@ -53,11 +53,6 @@
 (defvar *power-usage-datetime-format* "%Y/%m/%d %H時台"
   "ステータスバーに表示する時刻")
 
-(defvar *area-name*
-  '((:tokyo .  "東京電力")
-    (:tohoku . "東北電力")
-    (:kansai . "関西電力")))
-
 (defvar *power-usage-mode* nil)
 (defvar *mode-line* nil)
 
@@ -87,7 +82,7 @@
             (power-usage u)
             (power-capacity u)
             (power-usage-rate u)
-            (cdr (assoc (power-area u) *area-name*))
+            (area-name (power-area u))
             (power-saving-p u)
             (format-date-string *power-usage-datetime-format* (power-datetime u)))))
 

@@ -74,7 +74,7 @@
 (defun build-url (path)
   (format nil "~A/~A" *api-endpoint* path))
 
-(add-extension :tokyo :power-usage.tepco-usage-api)
+(add-extension '(:tokyo . "“Œ‹ž“d—Í") :power-usage.tepco-usage-api)
 
 
 (provide "power-usage/api/tepco-usage-api")

@@ -41,7 +41,7 @@
 (in-package :power-usage.base)
 
 (export '(add-extension
-          make-extension
+          area-name
 
           $
           json->struct
@@ -78,6 +78,7 @@
   saving-p                      ; この時刻に計画停電が実施されていれば t
   )
 
+;; (((:<area-code> . "<area-name>") . :<package-name>) ...)
 (defvar *extensions* nil)
 
 
@@ -88,17 +89,25 @@
           (power-capacity power))
        100.0)))
 
+;; area -> (:<area-code> . "<area-name>")
 (defun add-extension (area pkg)
   (setf *extensions* (delete pkg *extensions*))
   (push (cons area pkg) *extensions*))
 
+(defun area-name (area)
+  (let ((ext (find-extension area)))
+    (cdar ext)))
+
 (defun dispatch (fn area &rest args)
-  (let ((ext (find area *extensions*
-                   :test #'string= :key #'car)))
-    (unless ext
-      (error "~A には対応していません。" area))
+  (let ((ext (find-extension area)))
     (apply (intern (string fn) (cdr ext)) area args)))
 
+(defun find-extension (area)
+  (let ((ext (find area *extensions*
+                   :test #'string= :key #'caar)))
+    (unless ext
+      (error "~A には対応していません。" area))
+    ext))
 
 (defun $ (json &rest keys)
   (reduce #'(lambda (obj key)

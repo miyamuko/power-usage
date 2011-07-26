@@ -84,7 +84,9 @@
            (error "Not supported.")))
     (xhr::add-query-params *api-endpoint* params)))
 
-(dolist (area '(:tohoku :kansai))
+(dolist (area '((:tohoku . "“Œ–k“d—Í")
+                (:kansai . "ŠÖ¼“d—Í")
+                ))
   (add-extension area :power-usage.yahoo-setsuden-api))
 
 
