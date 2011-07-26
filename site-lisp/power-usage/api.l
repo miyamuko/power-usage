@@ -34,8 +34,6 @@
 (in-package :power-usage)
 
 (export '(*power-usage-area*
-          *power-usage-update-hook*
-          *last-power-usage*
 
           get-latest-power-usage
           get-power-usage-at
@@ -62,12 +60,6 @@
 :kyushu（九州電力管轄内）
 ")
 
-(defvar *power-usage-update-hook* nil
-  "自動更新時に実行されるフック")
-
-(defparameter *last-power-usage* nil
-  "最後に取得した電力消費量 (power 構造体)")
-
 
 (defun get-latest-power-usage (&optional (area *power-usage-area*))
   "最新の電力使用状況を返します。"
@@ -87,21 +79,6 @@
 (defun list-power-usage-at (year month &optional day (area *power-usage-area*))
   "指定された月または日の毎時の電力使用状況を、リストとして返します。"
   (get-power-usage area :datetime (list year month day nil) :history t))
-
-
-(defun update-power-usage (&optional (area *power-usage-area*))
-  "非同期で最新の電力使用状況を更新します。
-更新後は *last-power-usage* に値が設定され、
-*power-usage-update-hook* が呼ばれます。"
-  (interactive)
-  (xhr:xhr-get-async (build-api-endpoint area :latest t)
-                     :nomsg t :since :epoch
-                     :onsuccess #'(lambda (res)
-                                    (end-update-power-usage area res))))
-
-(defun end-update-power-usage (area res)
-  (setf *last-power-usage* (parse-response area res :latest t))
-  (run-hooks '*power-usage-update-hook*))
 
 
 (defun get-power-usage (area &key datetime latest history)

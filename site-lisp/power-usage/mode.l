@@ -35,6 +35,7 @@
 (export '(*power-usage-update-interval*
           *power-usage-mode-line-format*
           *power-usage-datetime-format*
+          *power-usage-update-hook*
 
           power-usage-mode
           start-power-usage-watcher
@@ -53,9 +54,28 @@
 (defvar *power-usage-datetime-format* "%Y/%m/%d %H:%M"
   "ステータスバーに表示する時刻")
 
+(defvar *power-usage-update-hook* nil
+  "自動更新時に実行されるフック")
+
 (defvar *power-usage-mode* nil)
 (defvar *mode-line* nil)
 
+
+(defun update-power-usage (&optional (area *power-usage-area*))
+  "非同期で最新の電力使用状況を更新します。
+更新後は power 構造体を引数にして *power-usage-update-hook* に
+設定したフックが呼ばれます。"
+  (interactive)
+  (let ((show-message-p (interactive-p)))
+    (xhr:xhr-get-async (build-api-endpoint area :latest t)
+                       :nomsg t :since :epoch
+                       :onsuccess #'(lambda (res)
+                                      (end-update-power-usage area res show-message-p)))))
+
+(defun end-update-power-usage (area res show-message-p)
+  (let ((power (parse-response area res :latest t)))
+    (update-mode-line-status power show-message-p)
+    (run-hook-with-args '*power-usage-update-hook* power)))
 
 
 (defun start-power-usage-watcher ()
@@ -68,36 +88,33 @@
   (interactive)
   (stop-timer 'update-power-usage))
 
-(defun power-usage-status (&optional (u *last-power-usage*))
-  (when u
+(defun power-usage-status (power)
+  (when power
     (format nil *power-usage-mode-line-format*
-            (power-usage u)
-            (power-capacity u)
-            (floor (power-usage-rate u))
+            (power-usage power)
+            (power-capacity power)
+            (floor (power-usage-rate power))
             )))
 
-(defun power-usage-long-status (&optional (u *last-power-usage*))
-  (when u
+(defun power-usage-long-status (power)
+  (when power
     (format nil *power-usage-status-format*
-            (format-date-string *power-usage-datetime-format* (power-datetime u))
-            (area-name (power-area u))
-            (power-usage u)
-            (power-capacity u)
-            (power-usage-rate u)
+            (format-date-string *power-usage-datetime-format* (power-datetime power))
+            (area-name (power-area power))
+            (power-usage power)
+            (power-capacity power)
+            (power-usage-rate power)
             )))
 
-(defun update-mode-line-status ()
-  (interactive)
-  (let ((status (power-usage-status))
-        (long-status (power-usage-long-status)))
+(defun update-mode-line-status (power show-message-p)
+  (let ((status (power-usage-status power))
+        (long-status (power-usage-long-status power)))
     (when status
-      (setf *mode-line* (power-usage-status))
+      (setf *mode-line* status)
       (update-mode-line t)
       (refresh-screen))
-    (when long-status
+    (when (and show-message-p long-status)
       (message long-status))))
-
-(add-hook '*power-usage-update-hook* 'update-mode-line-status)
 
 (defun power-usage-mode (&optional (arg nil sv))
   (interactive "p")
