@@ -1,3 +1,11 @@
+2011-07-26  MIYAMUKO Katsuyuki
+
+	* Yahoo 電力使用状況 API を利用して中部と九州の電力使用状況に対応 (#2)
+	(setf *power-usage-area* :chubu)
+	(setf *power-usage-area* :kyushu)
+	http://pr.yahoo.co.jp/release/2011/0714a.html
+	http://developer.yahoo.co.jp/webapi/shinsai/setsuden/v1/latestpowerusage.html
+
 2011-07-15  MIYAMUKO Katsuyuki
 
 	* power-uasge 1.1.1 リリース

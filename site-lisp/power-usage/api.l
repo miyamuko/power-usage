@@ -61,7 +61,10 @@
 
 :tokyo（東京電力管轄内）
 :tohoku（東北電力管轄内）
-:kansai（関西電力管轄内）")
+:kansai（関西電力管轄内）
+:chubu（中部電力管轄内）
+:kyushu（九州電力管轄内）
+")
 
 (defvar *power-usage-update-hook* nil
   "自動更新時に実行されるフック")

@@ -64,7 +64,7 @@
           ))
 
 (defstruct power
-  area                          ; 地域 (:tokyo, :kansai, :tohoku)
+  area                          ; 地域 (:tokyo, :tohoku, :kansai, :chubu, :kyushu)
   datetime                      ; 年月日 (ユニバーサルタイム)
   capacity                      ; 供給可能最大電力（万kW）
   usage                         ; この時刻の消費電力（万kW）

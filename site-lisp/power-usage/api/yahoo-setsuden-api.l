@@ -86,6 +86,8 @@
 
 (dolist (area '((:tohoku . "東北電力")
                 (:kansai . "関西電力")
+                (:chubu  . "中部電力")
+                (:kyushu . "九州電力")
                 ))
   (add-extension area :power-usage.yahoo-setsuden-api))
 
