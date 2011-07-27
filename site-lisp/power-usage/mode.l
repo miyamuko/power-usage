@@ -37,6 +37,7 @@
           *power-usage-datetime-format*
           *power-usage-update-hook*
 
+          update-power-usage
           power-usage-mode
           start-power-usage-watcher
           stop-power-usage-watcher

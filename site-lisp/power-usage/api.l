@@ -39,7 +39,6 @@
           get-power-usage-at
           list-latest-power-usage
           list-power-usage-at
-          update-power-usage
 
           ;; struct
           power-p
