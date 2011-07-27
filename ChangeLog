@@ -18,10 +18,12 @@
 	- tepco-usage-api は list-latest-power-usage, list-power-usage-at
 	  のみで利用
 	- 自動更新の間隔のデフォルト値を変更: 30 分 => 5 分
+	https://github.com/miyamuko/power-usage/issues/3
 
 	* Yahoo 電力使用状況 API を利用して中部と九州の電力使用状況に対応 (#2)
 	(setf *power-usage-area* :chubu)
 	(setf *power-usage-area* :kyushu)
+	https://github.com/miyamuko/power-usage/issues/2
 	http://pr.yahoo.co.jp/release/2011/0714a.html
 	http://developer.yahoo.co.jp/webapi/shinsai/setsuden/v1/latestpowerusage.html
 
