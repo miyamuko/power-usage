@@ -42,6 +42,7 @@
 
 (export '(add-extension
           area-name
+          list-supported-area
 
           $
           parse-response
@@ -86,6 +87,14 @@
 (defun area-name (area)
   (let ((ext (find-extensions area)))
     (cdaar ext)))
+
+;; ((:<area-code1> . "<area-name1>")
+;;  (:<area-code2> . "<area-name2>")
+;;  ...)
+(defun list-supported-area ()
+  (nreverse
+   (delete-duplicates (mapcar #'car *extensions*)
+                      :key #'car)))
 
 (defun dispatch (symbol area &rest args)
   (dolist (ext (find-extensions area))

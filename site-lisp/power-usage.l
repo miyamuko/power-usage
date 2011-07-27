@@ -29,6 +29,7 @@
 
 (require "power-usage/version")
 (require "power-usage/mode")
+(require "power-usage/graph")
 
 
 (provide "power-usage")

@@ -1,3 +1,8 @@
+2011-07-27  MIYAMUKO Katsuyuki
+
+	* (show-power-usage-graph): 電力各社の状況を一覧でグラフ表示 (#5)
+	https://github.com/miyamuko/power-usage/issues/5
+
 2011-07-26  MIYAMUKO Katsuyuki
 
 	* power-uasge 1.2.0 リリース
