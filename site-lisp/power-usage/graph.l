@@ -62,7 +62,7 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defvar *power-usage-graph-y-axis-format* "~8A  "
   "会社名のカラム幅")
 
-(defvar *power-usage-graph-bar-format* "~A ~3D%  ~:D/~:D万kW  ~A~%~%"
+(defvar *power-usage-graph-bar-format* "~A ~3D%  ~4D/~4D万kW  ~A~%~%"
   "棒グラフと供給量などの情報のフォーマット")
 
 (defvar *power-usage-graph-bar-date-format* "%H時%M分"
