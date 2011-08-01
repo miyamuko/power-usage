@@ -27,6 +27,7 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (require "power-usage/package")
+  (require "power-usage/macros")
   (require "power-usage/api")
   )
 
@@ -37,6 +38,7 @@
           *power-usage-graph-y-axis-format*
           *power-usage-graph-bar-format*
           *power-usage-graph-buffer-name*
+          *power-usage-graph-buffer-height*
           *power-usage-graph-bar-char*
           *power-usage-graph-empty-char*
 
@@ -56,13 +58,16 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defvar *power-usage-graph-buffer-name* "*Power Usage*"
   "バッファ名")
 
+(defvar *power-usage-graph-buffer-height* -12
+  "バッファの高さ")
+
 (defvar *power-usage-graph-size* 50
   "棒グラフの長さ")
 
 (defvar *power-usage-graph-y-axis-format* "~8A  "
   "会社名のカラム幅")
 
-(defvar *power-usage-graph-bar-format* "~A ~3D%  ~4D/~4D万kW  ~A~%~%"
+(defvar *power-usage-graph-bar-format* "~A ~3D%  ~4D/~4D万kW  ~A"
   "棒グラフと供給量などの情報のフォーマット")
 
 (defvar *power-usage-graph-bar-date-format* "%H時%M分"
@@ -78,37 +83,62 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defun show-power-usage-graph ()
   "電力各社の電力使用状況をグラフ表示します。"
   (interactive)
-  (long-operation
-    (with-output-to-temp-buffer (*power-usage-graph-buffer-name*)
-      (render-header)
-      (dolist (area (list-supported-area))
-        (let ((power (get-latest-power-usage (car area))))
-          (render-graph power)
-          (colorize power)
-          (goto-char (buffer-stream-point *standard-output*))
-          (refresh-screen)
-          (do-events)
-          ))
-      (goto-char (point-min))
-      )))
+  (if (find-buffer *power-usage-graph-buffer-name*)
+      (refresh-power-usage-graph)
+    (init-power-usage-graph)))
 
-(defun render-header ()
+(defun init-power-usage-graph ()
+  (with-output-to-graph-buffer
+    (render-x-header)
+    (dolist (area (list-supported-area))
+      (render-y-header (cdr area))
+      (format t "~%~%"))
+    ;; バッファの最後の余計な改行を削除
+    (end-of-buffer)
+    (skip-chars-backward "\n")
+    (kill-region (point) (point-max)))
+  (refresh-power-usage-graph))
+
+(defun refresh-power-usage-graph ()
+  (interactive)
+  (with-graph-buffer
+    (dolist (area (list-supported-area))
+      (goto-char (point-min))
+      (scan-buffer (cdr area))
+      (goto-eol)
+      (unless (char= #\SPC (char-before (point)))
+        (insert "  "))
+      (insert "更新中...")
+      (get-latest-power-usage :area (car area)
+                              :callback #'render-graph))))
+
+(defun render-x-header ()
   (format t *power-usage-graph-y-axis-format* "")
   (let ((len (calc-bar-length 11)))
     (dotimes (i 10)
       (format t "~VA" (if (= i 9) 0 len) (* i 10)))
     (terpri)))
 
-(defun render-graph (power)
+(defun render-y-header (area-name)
   (format t *power-usage-graph-y-axis-format*
-          (area-name (power-area power)))
-  (format t *power-usage-graph-bar-format*
-          (make-bar (calc-bar-length (power-usage-rate power)))
-          (floor (power-usage-rate power))
-          (power-usage power)
-          (power-capacity power)
-          (format-date-string *power-usage-graph-bar-date-format* (power-datetime power))
-          ))
+          area-name))
+
+(defun render-graph (power)
+  (with-graph-buffer
+    (goto-char (point-min))
+    (scan-buffer (area-name (power-area power)) :tail t)
+    (skip-chars-forward " ")
+    (kill-line)
+    (insert (format nil *power-usage-graph-bar-format*
+                    (make-bar (calc-bar-length (power-usage-rate power)))
+                    (floor (power-usage-rate power))
+                    (power-usage power)
+                    (power-capacity power)
+                    (format-date-string *power-usage-graph-bar-date-format* (power-datetime power))
+                    ))
+    (goto-bol)
+    (colorize power)
+    (beginning-of-buffer)))
 
 (defun colorize (power)
   (when (scan-buffer (make-str 5 *power-usage-graph-bar-char*))
