@@ -60,30 +60,35 @@
 ")
 
 
-(defun get-latest-power-usage (&optional (area *power-usage-area*))
+(defun get-latest-power-usage (&key callback (area *power-usage-area*))
   "最新の電力使用状況を返します。"
-  (get-power-usage area :latest t))
+  (get-power-usage callback area :latest t))
 
-(defun get-power-usage-at (year month day hour &optional (area *power-usage-area*))
+(defun get-power-usage-at (year month day hour &key callback (area *power-usage-area*))
   "指定された日時の電力使用状況を返します。"
-  (get-power-usage area :datetime (list year month day hour)))
+  (get-power-usage callback area :datetime (list year month day hour)))
 
 
-(defun list-latest-power-usage (&optional (area *power-usage-area*))
+(defun list-latest-power-usage (&key callback (area *power-usage-area*))
   "今月の毎時の電力使用状況を、リストとして返します。"
   (multiple-value-bind (_ _ _ _ month year _)
       (decode-universal-time (get-universal-time))
-    (get-power-usage area :datetime (list year month nil nil) :history t)))
+    (get-power-usage callback area :datetime (list year month nil nil) :history t)))
 
-(defun list-power-usage-at (year month &optional day (area *power-usage-area*))
+(defun list-power-usage-at (year month day &key callback (area *power-usage-area*))
   "指定された月または日の毎時の電力使用状況を、リストとして返します。"
-  (get-power-usage area :datetime (list year month day nil) :history t))
+  (get-power-usage callback area :datetime (list year month day nil) :history t))
 
 
-(defun get-power-usage (area &key datetime latest history)
-  (let* ((endpoint (build-api-endpoint area :datetime datetime :latest latest :history history))
-         (res (xhr:xhr-get endpoint :nomsg t :since :epoch)))
-    (parse-response area res :datetime datetime :latest latest :history history)))
+(defun get-power-usage (callback area &key datetime latest history)
+  (flet ((parse (res)
+           (parse-response area res :datetime datetime :latest latest :history history)))
+    (let ((endpoint (build-api-endpoint area :datetime datetime :latest latest :history history)))
+      (if callback
+          (xhr:xhr-get-async endpoint :nomsg t :since :epoch
+                             :onsuccess #'(lambda (res)
+                                            (funcall callback (parse res))))
+        (parse (xhr:xhr-get endpoint :nomsg t :since :epoch))))))
 
 
 (provide "power-usage/api")

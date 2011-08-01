@@ -68,15 +68,13 @@
 設定したフックが呼ばれます。"
   (interactive)
   (let ((show-message-p (interactive-p)))
-    (xhr:xhr-get-async (build-api-endpoint area :latest t)
-                       :nomsg t :since :epoch
-                       :onsuccess #'(lambda (res)
-                                      (end-update-power-usage area res show-message-p)))))
+    (get-latest-power-usage
+     :callback #'(lambda (power)
+                   (end-update-power-usage power show-message-p)))))
 
-(defun end-update-power-usage (area res show-message-p)
-  (let ((power (parse-response area res :latest t)))
-    (update-mode-line-status power show-message-p)
-    (run-hook-with-args '*power-usage-update-hook* power)))
+(defun end-update-power-usage (power show-message-p)
+  (update-mode-line-status power show-message-p)
+  (run-hook-with-args '*power-usage-update-hook* power))
 
 
 (defun start-power-usage-watcher ()
