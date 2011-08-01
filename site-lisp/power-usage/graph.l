@@ -41,6 +41,7 @@
           *power-usage-graph-buffer-height*
           *power-usage-graph-bar-char*
           *power-usage-graph-empty-char*
+          *power-usage-graph-map*
 
           show-power-usage-graph
           ))
@@ -79,6 +80,15 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defvar *power-usage-graph-empty-char* #\SPC
   "電力未使用の領域のグラフの文字")
 
+(defvar *power-usage-graph-map* nil
+  "グラフモードのキー定義")
+(unless *power-usage-graph-map*
+  (setf *power-usage-graph-map*
+        (let ((keymap (make-sparse-keymap)))
+          (define-key keymap #\q 'quit-power-usage-graph)
+          (define-key keymap #\r 'refresh-power-usage-graph)
+          keymap)))
+
 
 (defun show-power-usage-graph ()
   "電力各社の電力使用状況をグラフ表示します。"
@@ -86,6 +96,21 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
   (if (find-buffer *power-usage-graph-buffer-name*)
       (refresh-power-usage-graph)
     (init-power-usage-graph)))
+
+(defun power-usage-graph-mode (&optional (buffer (selected-buffer)))
+  (with-selected-buffer buffer
+    (kill-all-local-variables)
+    (toggle-read-only t)
+    (setf buffer-mode 'power-usage-graph-mode)
+    (setf mode-name "Power Usage")
+    (use-keymap *power-usage-graph-map*)
+    ))
+
+(defun quit-power-usage-graph ()
+  (interactive)
+  (delete-buffer (selected-buffer))
+  (when (< 1 (count-windows))
+    (delete-window)))
 
 (defun init-power-usage-graph ()
   (with-output-to-graph-buffer
@@ -96,7 +121,8 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
     ;; バッファの最後の余計な改行を削除
     (end-of-buffer)
     (skip-chars-backward "\n")
-    (kill-region (point) (point-max)))
+    (kill-region (point) (point-max))
+    (power-usage-graph-mode))
   (refresh-power-usage-graph))
 
 (defun refresh-power-usage-graph ()

@@ -45,11 +45,21 @@
        (set-buffer #2#))))
 (setf (get 'with-selected-buffer 'lisp-indent-hook) 0)
 
+(defmacro with-write-buffer (&body body)
+  `(let ((#1=#:read-only buffer-read-only))
+     (unwind-protect
+         (progn
+           (setf buffer-read-only nil)
+           ,@body)
+       (setf buffer-read-only #1#))))
+(setf (get 'with-write-buffer 'lisp-indent-hook) 0)
+
 (defmacro with-graph-buffer (&body body)
   `(let ((#1=#:buffer (find-buffer *power-usage-graph-buffer-name*)))
     (when #1#
       (with-selected-buffer #1#
-        ,@body))))
+        (with-write-buffer
+          ,@body)))))
 (setf (get 'with-graph-buffer 'lisp-indent-hook) 0)
 
 (defmacro with-output-to-graph-buffer (&body body)
