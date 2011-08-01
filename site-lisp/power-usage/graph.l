@@ -80,6 +80,8 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defvar *power-usage-graph-empty-char* #\SPC
   "電力未使用の領域のグラフの文字")
 
+(defvar *power-usage-auto-refresh-p* nil)
+
 (defvar *power-usage-graph-map* nil
   "グラフモードのキー定義")
 (unless *power-usage-graph-map*
@@ -87,6 +89,7 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
         (let ((keymap (make-sparse-keymap)))
           (define-key keymap #\q 'quit-power-usage-graph)
           (define-key keymap #\r 'refresh-power-usage-graph)
+          (define-key keymap #\a 'toggle-auto-refresh-mode)
           keymap)))
 
 
@@ -106,8 +109,35 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
     (use-keymap *power-usage-graph-map*)
     ))
 
+(defun toggle-auto-refresh-mode ()
+  (interactive)
+  (if *power-usage-auto-refresh-p*
+      (stop-auto-refresh-mode)
+    (start-auto-refresh-mode)))
+
+(defun start-auto-refresh-mode ()
+  (with-graph-buffer
+    (setf mode-name "Power Usage"))
+  (stop-timer 'refresh-power-usage-graph)
+  (setf *power-usage-auto-refresh-p* t))
+
+(defun stop-auto-refresh-mode ()
+  (with-graph-buffer
+    (setf mode-name "Power Usage:Auto Refresh"))
+  (stop-timer 'refresh-power-usage-graph)
+  (start-timer *power-usage-update-interval*
+               'auto-refresh-power-usage-graph)
+  (setf *power-usage-auto-refresh-p* nil))
+
+(defun auto-refresh-power-usage-graph ()
+  (interactive)
+  (if (find-buffer *power-usage-graph-buffer-name*)
+      (refresh-power-usage-graph)
+    (stop-auto-refresh-mode)))
+
 (defun quit-power-usage-graph ()
   (interactive)
+  (stop-auto-refresh-mode)
   (delete-buffer (selected-buffer))
   (when (< 1 (count-windows))
     (delete-window)))
@@ -129,14 +159,16 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
   (interactive)
   (with-graph-buffer
     (dolist (area (list-supported-area))
-      (goto-char (point-min))
-      (scan-buffer (cdr area))
-      (goto-eol)
-      (unless (char= #\SPC (char-before (point)))
-        (insert "  "))
-      (insert "更新中...")
+      (when (interactive-p)
+        (goto-char (point-min))
+        (scan-buffer (cdr area))
+        (goto-eol)
+        (unless (char= #\SPC (char-before (point)))
+          (insert "  "))
+        (insert "更新中..."))
       (get-latest-power-usage :area (car area)
-                              :callback #'render-graph))))
+                              :callback #'render-graph)))
+    (refresh-screen))
 
 (defun render-x-header ()
   (format t *power-usage-graph-y-axis-format* "")
@@ -154,7 +186,8 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
     (goto-char (point-min))
     (scan-buffer (area-name (power-area power)) :tail t)
     (skip-chars-forward " ")
-    (kill-line)
+    (unless (eolp)
+      (kill-line))
     (insert (format nil *power-usage-graph-bar-format*
                     (make-bar (calc-bar-length (power-usage-rate power)))
                     (floor (power-usage-rate power))
@@ -164,7 +197,8 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
                     ))
     (goto-bol)
     (colorize power)
-    (beginning-of-buffer)))
+    (beginning-of-buffer))
+  (refresh-screen))
 
 (defun colorize (power)
   (when (scan-buffer (make-str 5 *power-usage-graph-bar-char*))
