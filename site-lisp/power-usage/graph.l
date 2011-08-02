@@ -117,16 +117,16 @@ http://setsuden.yahoo.co.jp/meter/index.html Ç‡éQè∆ÅB")
 
 (defun start-auto-refresh-mode ()
   (with-graph-buffer
-    (setf mode-name "Power Usage"))
-  (stop-timer 'refresh-power-usage-graph)
-  (setf *power-usage-auto-refresh-p* t))
-
-(defun stop-auto-refresh-mode ()
-  (with-graph-buffer
     (setf mode-name "Power Usage:Auto Refresh"))
   (stop-timer 'refresh-power-usage-graph)
   (start-timer *power-usage-update-interval*
                'auto-refresh-power-usage-graph)
+  (setf *power-usage-auto-refresh-p* t))
+
+(defun stop-auto-refresh-mode ()
+  (with-graph-buffer
+    (setf mode-name "Power Usage"))
+  (stop-timer 'refresh-power-usage-graph)
   (setf *power-usage-auto-refresh-p* nil))
 
 (defun auto-refresh-power-usage-graph ()
