@@ -128,16 +128,26 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
   (stop-timer 'auto-refresh-power-usage-graph)
   (start-timer *power-usage-update-interval*
                'auto-refresh-power-usage-graph)
+  (add-hook 'ed::*delete-buffer-hook*
+            'on-delete-graph-buffer)
   )
 
 (defun stop-auto-refresh-mode ()
   (stop-timer 'auto-refresh-power-usage-graph)
+  (delete-hook 'ed::*delete-buffer-hook*
+               'on-delete-graph-buffer)
   )
 
 (defun update-mode-name ()
   (setf mode-name
         (format nil "電力使用状況:自動更新~:[Off~;On~]"
                 *power-usage-graph-auto-refresh-p*)))
+
+(defun on-delete-graph-buffer (buffer)
+  (when (eq (buffer-local-value buffer 'buffer-mode)
+            'power-usage-graph-mode)
+    (stop-auto-refresh-mode))
+  t)
 
 (defun auto-refresh-power-usage-graph ()
   (interactive)
