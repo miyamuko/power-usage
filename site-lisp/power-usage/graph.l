@@ -125,15 +125,15 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
       (update-mode-name))))
 
 (defun start-auto-refresh-mode ()
-  (stop-timer 'auto-refresh-power-usage-graph)
-  (start-timer *power-usage-update-interval*
-               'auto-refresh-power-usage-graph)
+  (add-hook '*power-usage-update-hook*
+            'on-power-usage-update)
   (add-hook 'ed::*delete-buffer-hook*
             'on-delete-graph-buffer)
   )
 
 (defun stop-auto-refresh-mode ()
-  (stop-timer 'auto-refresh-power-usage-graph)
+  (delete-hook '*power-usage-update-hook*
+               'on-power-usage-update)
   (delete-hook 'ed::*delete-buffer-hook*
                'on-delete-graph-buffer)
   )
@@ -149,10 +149,9 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
     (stop-auto-refresh-mode))
   t)
 
-(defun auto-refresh-power-usage-graph ()
-  (interactive)
+(defun on-power-usage-update (power)
   (if (find-buffer *power-usage-graph-buffer-name*)
-      (refresh-power-usage-graph)
+      (refresh-power-usage-graph power)
     (stop-auto-refresh-mode)))
 
 (defun quit-power-usage-graph ()
@@ -175,7 +174,7 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
     (power-usage-graph-mode))
   (refresh-power-usage-graph))
 
-(defun refresh-power-usage-graph ()
+(defun refresh-power-usage-graph (&optional power)
   (interactive)
   (with-graph-buffer
     (dolist (area (list-supported-area))
@@ -184,8 +183,10 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
         (unless (char= #\SPC (char-before (point)))
           (insert "  "))
         (insert "更新中..."))
-      (get-latest-power-usage :area (car area)
-                              :callback #'render-graph)))
+      (if (and power (eq (car area) (power-area power)))
+          (render-graph power)
+        (get-latest-power-usage :area (car area)
+                                :callback #'render-graph))))
     (refresh-screen))
 
 (defun render-x-header ()
