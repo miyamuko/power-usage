@@ -89,14 +89,15 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defvar *power-usage-graph-auto-refresh-p* nil
  "電力使用状況グラフを自動更新するかどうか")
 
-(defvar *power-usage-graph-map*
-  (or *power-usage-graph-map*
-      (let ((keymap (make-sparse-keymap)))
-        (define-key keymap #\q 'quit-power-usage-graph)
-        (define-key keymap #\r 'refresh-power-usage-graph)
-        (define-key keymap #\a 'toggle-auto-refresh-mode)
-        keymap))
+(defvar *power-usage-graph-map* nil
   "グラフモードのキー定義")
+(unless *power-usage-graph-map*
+  (setf *power-usage-graph-map*
+        (let ((keymap (make-sparse-keymap)))
+          (define-key keymap #\q 'quit-power-usage-graph)
+          (define-key keymap #\r 'refresh-power-usage-graph)
+          (define-key keymap #\a 'toggle-auto-refresh-mode)
+          keymap)))
 
 
 (defun show-power-usage-graph ()
