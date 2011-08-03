@@ -29,6 +29,7 @@
   (require "power-usage/package")
   (require "power-usage/macros")
   (require "power-usage/api")
+  (require "power-usage/mode")
   )
 
 (in-package :power-usage)
@@ -136,6 +137,8 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
             'on-power-usage-update)
   (add-hook 'ed::*delete-buffer-hook*
             'on-delete-graph-buffer)
+  (unless *power-usage-mode*
+    (start-power-usage-watcher))
   )
 
 (defun stop-auto-refresh-mode ()
@@ -143,6 +146,8 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
                'on-power-usage-update)
   (delete-hook 'ed::*delete-buffer-hook*
                'on-delete-graph-buffer)
+  (unless *power-usage-mode*
+    (stop-power-usage-watcher))
   )
 
 (defun update-mode-name ()
