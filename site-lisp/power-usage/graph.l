@@ -117,13 +117,13 @@ http://setsuden.yahoo.co.jp/meter/index.html Ç‡éQè∆ÅB")
     (update-mode-name)))
 
 (defun start-auto-refresh-mode ()
-  (stop-timer 'refresh-power-usage-graph)
+  (stop-timer 'auto-refresh-power-usage-graph)
   (start-timer *power-usage-update-interval*
                'auto-refresh-power-usage-graph)
   (setf *power-usage-auto-refresh-p* t))
 
 (defun stop-auto-refresh-mode ()
-  (stop-timer 'refresh-power-usage-graph)
+  (stop-timer 'auto-refresh-power-usage-graph)
   (setf *power-usage-auto-refresh-p* nil))
 
 (defun update-mode-name ()
