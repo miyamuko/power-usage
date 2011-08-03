@@ -34,7 +34,8 @@
 (in-package :power-usage)
 
 (export '(*power-usage-graph-colors*
-          *power-usage-graph-size*
+          *power-usage-graph-min-size*
+          *power-usage-graph-max-size*
           *power-usage-graph-y-axis-format*
           *power-usage-graph-bar-format*
           *power-usage-graph-buffer-name*
@@ -63,8 +64,11 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defvar *power-usage-graph-buffer-height* -12
   "バッファの高さ")
 
-(defvar *power-usage-graph-size* 50
-  "棒グラフの長さ")
+(defvar *power-usage-graph-min-size* 30
+  "棒グラフの最小の長さ。基本的にはウィンドウサイズにぴったりおさまるように自動調整する")
+
+(defvar *power-usage-graph-max-size* 100
+  "棒グラフの最大の長さ。基本的にはウィンドウサイズにぴったりおさまるように自動調整する")
 
 (defvar *power-usage-graph-y-axis-format* "~8A  "
   "会社名のカラム幅")
@@ -105,6 +109,9 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
   (with-selected-buffer buffer
     (kill-all-local-variables)
     (toggle-read-only t)
+    (set-local-window-flags buffer *window-flag-line-number* nil)
+    (set-local-window-flags buffer *window-flag-vscroll-bar* nil)
+    (set-local-window-flags buffer *window-flag-hscroll-bar* nil)
     (setf buffer-mode 'power-usage-graph-mode)
     (update-mode-name)
     (use-keymap *power-usage-graph-map*)
@@ -163,10 +170,11 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 
 (defun init-power-usage-graph ()
   (with-output-to-graph-buffer
-    (render-x-header)
+    (refresh-screen) ; window-width を確定させるためここで一度レンダリング
+    (insert #\SPC #\LFD)   ; あとで render-x-header するためのスペース
     (dolist (area (list-supported-area))
       (render-y-header (cdr area))
-      (format t "~%~%"))
+      (insert #\LFD #\LFD))
     ;; バッファの最後の余計な改行を削除
     (end-of-buffer)
     (skip-chars-backward "\n")
@@ -177,11 +185,12 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defun refresh-power-usage-graph (&optional power)
   (interactive)
   (with-graph-buffer
+    (beginning-of-buffer)
+    (kill-line)
+    (render-x-header)
     (dolist (area (list-supported-area))
       (when (interactive-p)
         (beginning-of-bar (cdr area) :clear t)
-        (unless (char= #\SPC (char-before (point)))
-          (insert "  "))
         (insert "更新中..."))
       (if (and power (eq (car area) (power-area power)))
           (render-graph power)
@@ -190,26 +199,22 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
     (refresh-screen))
 
 (defun render-x-header ()
-  (format t *power-usage-graph-y-axis-format* "")
-  (let ((len (calc-bar-length 11)))
+  (insert (format-y-axis ""))
+  (let ((len (calc-bar-length 10)))
     (dotimes (i 10)
-      (format t "~VA" (if (= i 9) 0 len) (* i 10)))
-    (terpri)))
+      (insert (format nil "~VA" (if (= i 9) 0 len) (* i 10))))))
 
 (defun render-y-header (area-name)
-  (format t *power-usage-graph-y-axis-format*
-          area-name))
+  (insert (format-y-axis area-name)))
 
 (defun render-graph (power)
   (with-graph-buffer
     (beginning-of-bar (area-name (power-area power)) :clear t)
-    (insert (format nil *power-usage-graph-bar-format*
-                    (make-bar (calc-bar-length (power-usage-rate power)))
-                    (floor (power-usage-rate power))
-                    (power-usage power)
-                    (power-capacity power)
-                    (format-date-string *power-usage-graph-bar-date-format* (power-datetime power))
-                    ))
+    (insert (format-bar (make-bar (calc-bar-length (power-usage-rate power)))
+                        (power-usage-rate power)
+                        (power-usage power)
+                        (power-capacity power)
+                        (power-datetime power)))
     (goto-bol)
     (colorize power)
     (beginning-of-buffer))
@@ -250,10 +255,35 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
       100000
     (getf color :usage)))
 
-(defun calc-bar-length (rate &optional (graph-size *power-usage-graph-size*))
+(defun calc-bar-length (rate &optional (graph-size (calc-graph-size)))
   (floor (* rate (/ graph-size 100))))
 
-(defun make-bar (len &optional (graph-size *power-usage-graph-size*))
+(defun calc-graph-size ()
+  (let* ((info-len (+ (length (format-y-axis ""))
+                      (length (format-bar "" 0 0 0 0))))
+         (bar-len (- (window-width)
+                     4 ; なんかこのぐらい引かないと入りきらない
+                     info-len)))
+    ;; x-header が綺麗に揃うように 10 の倍数にする
+    (* (floor (/ (max *power-usage-graph-min-size*
+                      (min *power-usage-graph-max-size*
+                           bar-len))
+                 10))
+       10)))
+
+(defun format-y-axis (area-name)
+  (format nil *power-usage-graph-y-axis-format*
+          area-name))
+
+(defun format-bar (bar rate usage capacity datetime)
+  (format nil *power-usage-graph-bar-format*
+          bar
+          (floor rate)
+          usage
+          capacity
+          (format-date-string *power-usage-graph-bar-date-format* datetime)))
+
+(defun make-bar (len &optional (graph-size (calc-graph-size)))
   (format nil "~A~A"
           (make-str len *power-usage-graph-bar-char*)
           (make-str (- graph-size len) *power-usage-graph-empty-char*)))
