@@ -104,7 +104,7 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
     (kill-all-local-variables)
     (toggle-read-only t)
     (setf buffer-mode 'power-usage-graph-mode)
-    (setf mode-name "Power Usage")
+    (update-mode-name)
     (use-keymap *power-usage-graph-map*)
     ))
 
@@ -112,21 +112,24 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
   (interactive)
   (if *power-usage-auto-refresh-p*
       (stop-auto-refresh-mode)
-    (start-auto-refresh-mode)))
+    (start-auto-refresh-mode))
+  (with-graph-buffer
+    (update-mode-name)))
 
 (defun start-auto-refresh-mode ()
-  (with-graph-buffer
-    (setf mode-name "Power Usage:Auto Refresh"))
   (stop-timer 'refresh-power-usage-graph)
   (start-timer *power-usage-update-interval*
                'auto-refresh-power-usage-graph)
   (setf *power-usage-auto-refresh-p* t))
 
 (defun stop-auto-refresh-mode ()
-  (with-graph-buffer
-    (setf mode-name "Power Usage"))
   (stop-timer 'refresh-power-usage-graph)
   (setf *power-usage-auto-refresh-p* nil))
+
+(defun update-mode-name ()
+  (setf mode-name
+        (format nil "電力使用状況:自動更新~:[Off~;On~]"
+                *power-usage-auto-refresh-p*)))
 
 (defun auto-refresh-power-usage-graph ()
   (interactive)
