@@ -44,6 +44,7 @@
           *power-usage-graph-map*
 
           show-power-usage-graph
+          toggle-auto-refresh-mode
           ))
 
 (defvar *power-usage-graph-colors*
@@ -107,25 +108,31 @@ http://setsuden.yahoo.co.jp/meter/index.html Ç‡éQè∆ÅB")
     (setf buffer-mode 'power-usage-graph-mode)
     (update-mode-name)
     (use-keymap *power-usage-graph-map*)
+    (when *power-usage-graph-auto-refresh-p*
+      (start-auto-refresh-mode))
     ))
 
-(defun toggle-auto-refresh-mode ()
+(defun toggle-auto-refresh-mode (&optional (on nil on-supplied-p))
   (interactive)
-  (if *power-usage-graph-auto-refresh-p*
-      (stop-auto-refresh-mode)
-    (start-auto-refresh-mode))
-  (with-graph-buffer
-    (update-mode-name)))
+  (let ((flag (if on-supplied-p
+                  on
+                (not *power-usage-graph-auto-refresh-p*))))
+    (if flag
+        (start-auto-refresh-mode)
+      (stop-auto-refresh-mode))
+    (setf *power-usage-graph-auto-refresh-p* flag)
+    (with-graph-buffer
+      (update-mode-name))))
 
 (defun start-auto-refresh-mode ()
   (stop-timer 'auto-refresh-power-usage-graph)
   (start-timer *power-usage-update-interval*
                'auto-refresh-power-usage-graph)
-  (setf *power-usage-graph-auto-refresh-p* t))
+  )
 
 (defun stop-auto-refresh-mode ()
   (stop-timer 'auto-refresh-power-usage-graph)
-  (setf *power-usage-graph-auto-refresh-p* nil))
+  )
 
 (defun update-mode-name ()
   (setf mode-name
