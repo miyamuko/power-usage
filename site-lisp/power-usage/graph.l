@@ -80,7 +80,8 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defvar *power-usage-graph-empty-char* #\SPC
   "電力未使用の領域のグラフの文字")
 
-(defvar *power-usage-auto-refresh-p* nil)
+(defvar *power-usage-graph-auto-refresh-p* nil
+ "電力使用状況グラフを自動更新するかどうか")
 
 (defvar *power-usage-graph-map*
   (or *power-usage-graph-map*
@@ -110,7 +111,7 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 
 (defun toggle-auto-refresh-mode ()
   (interactive)
-  (if *power-usage-auto-refresh-p*
+  (if *power-usage-graph-auto-refresh-p*
       (stop-auto-refresh-mode)
     (start-auto-refresh-mode))
   (with-graph-buffer
@@ -120,16 +121,16 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
   (stop-timer 'auto-refresh-power-usage-graph)
   (start-timer *power-usage-update-interval*
                'auto-refresh-power-usage-graph)
-  (setf *power-usage-auto-refresh-p* t))
+  (setf *power-usage-graph-auto-refresh-p* t))
 
 (defun stop-auto-refresh-mode ()
   (stop-timer 'auto-refresh-power-usage-graph)
-  (setf *power-usage-auto-refresh-p* nil))
+  (setf *power-usage-graph-auto-refresh-p* nil))
 
 (defun update-mode-name ()
   (setf mode-name
         (format nil "電力使用状況:自動更新~:[Off~;On~]"
-                *power-usage-auto-refresh-p*)))
+                *power-usage-graph-auto-refresh-p*)))
 
 (defun auto-refresh-power-usage-graph ()
   (interactive)
