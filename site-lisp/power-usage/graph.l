@@ -68,11 +68,11 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defvar *power-usage-graph-min-size* 30
   "棒グラフの最小の長さ。基本的にはウィンドウサイズにぴったりおさまるように自動調整する")
 
-(defvar *power-usage-graph-max-size* 100
+(defvar *power-usage-graph-max-size* 200
   "棒グラフの最大の長さ。基本的にはウィンドウサイズにぴったりおさまるように自動調整する")
 
 (defvar *power-usage-graph-y-axis-format* "~8A  "
-  "会社名のカラム幅")
+  "会社名のフォーマット")
 
 (defvar *power-usage-graph-bar-format* "~A ~3D%  ~4D/~4D万kW  ~A"
   "棒グラフと供給量などの情報のフォーマット")
