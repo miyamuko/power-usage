@@ -228,8 +228,7 @@ http://setsuden.yahoo.co.jp/meter/index.html Ç‡éQè∆ÅB")
 
 (defun beginning-of-bar (area-name &key clear)
   (goto-char (point-min))
-  (scan-buffer area-name :tail t)
-  (skip-chars-forward " ")
+  (scan-buffer (format-y-axis area-name) :tail t)
   (when (and clear (not (eolp)))
     (kill-line)))
 
