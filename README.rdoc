@@ -10,6 +10,8 @@
 2. <tt>\*power-usage-update-interval*</tt> で監視間隔を秒単位で設定 (デフォルトは 300 秒 (5 分))
 3. <tt>\*power-usage-mode-line-format*</tt> でモードラインをお好みで設定
 4. <tt>M-x power-usage-mode</tt> でモードラインへの表示をトグル
+5. <tt>M-x show-power-usage-graph</tt> で電力各社の状況を一覧でグラフ表示
+
 
 === DESCRIPTION
 
