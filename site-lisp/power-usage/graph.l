@@ -103,9 +103,8 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defun show-power-usage-graph ()
   "電力各社の電力使用状況をグラフ表示します。"
   (interactive)
-  (if (find-buffer *power-usage-graph-buffer-name*)
-      (refresh-power-usage-graph)
-    (init-power-usage-graph)))
+  (init-power-usage-graph)
+  (refresh-power-usage-graph))
 
 (defun power-usage-graph-mode (&optional (buffer (selected-buffer)))
   (with-selected-buffer buffer
@@ -185,8 +184,7 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
     (end-of-buffer)
     (skip-chars-backward "\n")
     (kill-region (point) (point-max))
-    (power-usage-graph-mode))
-  (refresh-power-usage-graph))
+    (power-usage-graph-mode)))
 
 (defun refresh-power-usage-graph (&optional power)
   (interactive)
