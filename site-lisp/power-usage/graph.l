@@ -45,6 +45,8 @@
           *power-usage-graph-bar-char*
           *power-usage-graph-empty-char*
           *power-usage-graph-map*
+          *power-usage-graph-window-flags-on*
+          *power-usage-graph-window-flags-off*
 
           show-power-usage-graph
           toggle-auto-refresh-mode
@@ -97,6 +99,32 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
           (define-key keymap #\a 'toggle-auto-refresh-mode)
           keymap)))
 
+(defvar *power-usage-graph-window-flags-on*
+  (list *window-flag-mode-line*
+        )
+  "グラフバッファで有効にする window flag")
+
+(defvar *power-usage-graph-window-flags-off*
+  (list *window-flag-line-number*
+        *window-flag-ruler*
+        *window-flag-newline*
+        *window-flag-tab*
+        *window-flag-full-width-space*
+        *window-flag-zenkaku-space*
+        *window-flag-vscroll-bar*
+        *window-flag-eof*
+        *window-flag-hscroll-bar*
+        ed::*window-flag-function-bar*
+        *window-flag-fold-mark*
+        *window-flag-cursor-line*
+        *window-flag-half-width-space*
+        *window-flag-alternate-vscroll-bar*
+        *window-flag-scrolling*
+        *window-flag-just-inverse*
+        *window-flag-fold-line*
+        )
+    "グラフバッファで無効にする window flag")
+
 
 (defparameter *power-usage-graph-auto-refresh-p* nil
  "電力使用状況グラフを自動更新するかどうか")
@@ -112,9 +140,10 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
   (with-selected-buffer buffer
     (kill-all-local-variables)
     (toggle-read-only t)
-    (set-local-window-flags buffer *window-flag-line-number* nil)
-    (set-local-window-flags buffer *window-flag-vscroll-bar* nil)
-    (set-local-window-flags buffer *window-flag-hscroll-bar* nil)
+    (dolist (flag *power-usage-graph-window-flags-on*)
+      (set-local-window-flags buffer flag t))
+    (dolist (flag *power-usage-graph-window-flags-off*)
+      (set-local-window-flags buffer flag nil))
     (setf buffer-mode 'power-usage-graph-mode)
     (update-mode-name)
     (use-keymap *power-usage-graph-map*)
