@@ -35,12 +35,13 @@
 (in-package :power-usage)
 
 (export '(*power-usage-graph-colors*
+          *power-usage-graph-buffer-name*
+          *power-usage-graph-buffer-height*
           *power-usage-graph-min-size*
           *power-usage-graph-max-size*
           *power-usage-graph-y-axis-format*
           *power-usage-graph-bar-format*
-          *power-usage-graph-buffer-name*
-          *power-usage-graph-buffer-height*
+          *power-usage-graph-bar-date-format*
           *power-usage-graph-bar-char*
           *power-usage-graph-empty-char*
           *power-usage-graph-map*
@@ -83,11 +84,8 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defvar *power-usage-graph-bar-char* #\#
   "電力使用中の領域のグラフの文字")
 
-(defvar *power-usage-graph-empty-char* #\SPC
+(defvar *power-usage-graph-empty-char* #\-
   "電力未使用の領域のグラフの文字")
-
-(defvar *power-usage-graph-auto-refresh-p* nil
- "電力使用状況グラフを自動更新するかどうか")
 
 (defvar *power-usage-graph-map* nil
   "グラフモードのキー定義")
@@ -98,6 +96,10 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
           (define-key keymap #\r 'refresh-power-usage-graph)
           (define-key keymap #\a 'toggle-auto-refresh-mode)
           keymap)))
+
+
+(defparameter *power-usage-graph-auto-refresh-p* nil
+ "電力使用状況グラフを自動更新するかどうか")
 
 
 (defun show-power-usage-graph ()
