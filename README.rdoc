@@ -1,7 +1,7 @@
 == power-usage - 電力使用状況をモードラインに表示
 
 * Home URL: http://miyamuko.s56.xrea.com/xyzzy/power-usage/intro.htm
-* Version: 1.3.0
+* Version: 1.3.1
 
 
 === SYNOPSIS
