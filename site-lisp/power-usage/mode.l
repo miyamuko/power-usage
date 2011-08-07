@@ -35,6 +35,7 @@
 (export '(*power-usage-update-interval*
           *power-usage-mode-line-format*
           *power-usage-datetime-format*
+          *power-usage-enable-status-message*
           *power-usage-update-hook*
 
           update-power-usage
@@ -55,11 +56,16 @@
 (defvar *power-usage-datetime-format* "%Y/%m/%d %H:%M"
   "ステータスバーに表示する時刻")
 
+(defvar *power-usage-enable-status-message* nil
+  "自動更新時にステータスバーに詳細情報を表示する場合 t")
+
 (defvar *power-usage-update-hook* nil
   "自動更新時に実行されるフック")
 
 (defvar *power-usage-mode* nil)
 (defvar *mode-line* nil)
+
+(defparameter *last-power-usage* nil)
 
 
 (defun update-power-usage (&optional (area *power-usage-area*))
@@ -67,14 +73,16 @@
 更新後は power 構造体を引数にして *power-usage-update-hook* に
 設定したフックが呼ばれます。"
   (interactive)
-  (let ((show-message-p (interactive-p)))
+  (let ((manual-update-p (interactive-p)))
     (get-latest-power-usage
      :callback #'(lambda (power)
-                   (end-update-power-usage power show-message-p)))))
+                   (end-update-power-usage power manual-update-p)))))
 
-(defun end-update-power-usage (power show-message-p)
-  (update-mode-line-status power show-message-p)
-  (run-hook-with-args '*power-usage-update-hook* power))
+(defun end-update-power-usage (power manual-update-p)
+  (update-mode-line-status power manual-update-p)
+  (run-hook-with-args '*power-usage-update-hook* power)
+  (setf *last-power-usage* power)
+  )
 
 
 (defun start-power-usage-watcher ()
@@ -105,14 +113,21 @@
             (power-usage-rate power)
             )))
 
-(defun update-mode-line-status (power show-message-p)
+(defun update-mode-line-status (power manual-update-p)
   (let ((status (power-usage-status power))
         (long-status (power-usage-long-status power)))
     (when status
       (setf *mode-line* status)
       (update-mode-line t)
       (refresh-screen))
-    (when (and show-message-p long-status)
+    (when (and long-status
+               (or manual-update-p
+                   (and *power-usage-enable-status-message*
+                        (or (not *last-power-usage*)
+                            (/= (power-usage power)
+                                (power-usage *last-power-usage*))
+                            (/= (power-capacity power)
+                                (power-capacity *last-power-usage*))))))
       (message long-status))))
 
 (defun power-usage-mode (&optional (arg nil sv))

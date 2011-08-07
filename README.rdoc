@@ -39,6 +39,12 @@ http://developer.yahoo.co.jp/webapi/shinsai/setsuden/v1/latestpowerusage.html
    ~/.xyzzy または site-lisp/siteinit.l に以下のコードを追加します。
 
      (require "power-usage")
+     (power-usage:power-usage-mode t)
+
+   ※ ni-autoload を利用している場合は設定は不要です。
+
+3. お好みで設定します。
+
      ;; 東京電力 (デフォルト)
      ; (setf power-usage:*power-usage-area* :tokyo)
      ;; 東北電力
@@ -49,11 +55,11 @@ http://developer.yahoo.co.jp/webapi/shinsai/setsuden/v1/latestpowerusage.html
      ; (setf power-usage:*power-usage-area* :chubu)
      ;; 九州電力
      ; (setf power-usage:*power-usage-area* :kyushu)
-     (power-usage:power-usage-mode t)
 
-   ※ ni-autoload を利用している場合は設定は不要です。
+     ;; ステータスバーに詳細情報を表示する
+     ; (setf power-usage:*power-usage-enable-status-message* t)
 
-3. 設定を反映させるため xyzzy を再起動してください。
+4. 設定を反映させるため xyzzy を再起動してください。
 
    ※siteinit.l に記述した場合には再ダンプが必要です。
 
