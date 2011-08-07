@@ -1,5 +1,10 @@
 2011-08-07  MIYAMUKO Katsuyuki
 
+	* グラフ表示していると Mark がセットされたり、kill-ring にゴミが yank されたり
+	していたのを修正 (#6)
+	Reported by @jujuria
+	https://github.com/miyamuko/power-usage/issues/6
+
 	* *power-usage-enable-status-message* が non-nil で前回取得時から
 	値が変わっている場合にはステータスバーに詳細情報を表示するようにした (#7)
 	Reported by @jujuria
