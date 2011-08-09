@@ -32,17 +32,18 @@
 (in-package :power-usage)
 
 (defmacro with-selected-buffer (buffer &body body)
-  `(let ((#1=#:new ,buffer)
-         (#2=#:old (selected-buffer)))
-     (unwind-protect
-         (if (get-buffer-window #1#)
-             (with-selected-window
-               (set-window (get-buffer-window #1#))
-               ,@body)
-           (with-set-buffer
-             (set-buffer #1#)
-             ,@body))
-       (set-buffer #2#))))
+  `(with-set-buffer
+     (let ((#1=#:new ,buffer)
+           (#2=#:old (selected-buffer)))
+       (unwind-protect
+           (if (get-buffer-window #1#)
+               (with-selected-window
+                 (set-window (get-buffer-window #1#))
+                 ,@body)
+             (progn
+               (set-buffer #1#)
+               ,@body))
+         (set-buffer #2#)))))
 (setf (get 'with-selected-buffer 'lisp-indent-hook) 0)
 
 (defmacro with-write-buffer (&body body)
