@@ -1,5 +1,9 @@
 2011-08-09  MIYAMUKO Katsuyuki
 
+	* グラフの自動更新を有効にするとバッファがちらつく問題を修正 (#8)
+	Reported by @jujuria
+	https://github.com/miyamuko/power-usage/issues/8
+
 	* ミニバッファにカーソルがある状態で更新するとエラーになる問題を修正 (#11)
 	https://github.com/miyamuko/power-usage/issues/11
 

@@ -56,11 +56,11 @@
 (setf (get 'with-write-buffer 'lisp-indent-hook) 0)
 
 (defmacro with-graph-buffer (&body body)
-  `(let ((#1=#:buffer (find-buffer *power-usage-graph-buffer-name*)))
-    (when #1#
-      (with-selected-buffer #1#
-        (with-write-buffer
-          ,@body)))))
+  `(let ((#1=#:buffer (find-graph-buffer)))
+     (when #1#
+       (with-selected-buffer #1#
+         (with-write-buffer
+           ,@body)))))
 (setf (get 'with-graph-buffer 'lisp-indent-hook) 0)
 
 (defmacro with-output-to-graph-buffer (&body body)

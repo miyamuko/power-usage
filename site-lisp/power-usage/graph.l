@@ -134,7 +134,7 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
   "電力各社の電力使用状況をグラフ表示します。"
   (interactive)
   (init-power-usage-graph)
-  (refresh-power-usage-graph))
+  (call-interactively 'refresh-power-usage-graph))
 
 (defun power-usage-graph-mode (&optional (buffer (selected-buffer)))
   (with-selected-buffer buffer
@@ -219,19 +219,34 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 
 (defun refresh-power-usage-graph (&optional power)
   (interactive)
-  (with-graph-buffer
-    (goto-char (point-min))
-    (delete-line)
-    (render-x-header)
-    (dolist (area (list-supported-area))
-      (when (interactive-p)
-        (beginning-of-bar (cdr area) :clear t)
-        (insert "更新中..."))
-      (if (and power (eq (car area) (power-area power)))
-          (render-graph power)
-        (get-latest-power-usage :area (car area)
-                                :callback #'render-graph))))
-    (refresh-screen))
+  (let ((manual-update-p (interactive-p)))
+    (with-graph-buffer
+      (goto-char (point-min))
+      (delete-line)
+      (render-x-header)
+      (let ((latch 0)
+            (refresh-later-p nil))
+        (dolist (area (list-supported-area))
+          (when manual-update-p
+            (beginning-of-bar (cdr area) :clear t)
+            (insert "更新中..."))
+          (if (and power (eq (car area) (power-area power)))
+              (render-graph power)
+            (progn
+              (get-latest-power-usage
+               :area (car area)
+               :callback #'(lambda (power)
+                             (decf latch)
+                             (let ((updated-p (render-graph power)))
+                               (when updated-p
+                                 (setf refresh-later-p t))
+                               (when (or manual-update-p         ; - 手動更新の場合
+                                         (and (zerop latch)      ; - 最後のリクエストが終了し、
+                                              refresh-later-p))  ;   グラフが変更されていた場合
+                                 (refresh-screen)))))
+              (incf latch))))
+        (when manual-update-p
+          (refresh-screen))))))
 
 (defun render-x-header ()
   (insert (format-y-axis ""))
@@ -244,16 +259,21 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 
 (defun render-graph (power)
   (with-graph-buffer
-    (beginning-of-bar (area-name (power-area power)) :clear t)
-    (insert (format-bar (make-bar (calc-bar-length (power-usage-rate power)))
-                        (power-usage-rate power)
-                        (power-usage power)
-                        (power-capacity power)
-                        (power-datetime power)))
-    (goto-bol)
-    (colorize power)
-    (goto-char (point-min)))
-  (refresh-screen))
+    (save-excursion
+      (let ((bar (format-bar (make-bar (calc-bar-length (power-usage-rate power)))
+                             (power-usage-rate power)
+                             (power-usage power)
+                             (power-capacity power)
+                             (power-datetime power))))
+        (beginning-of-bar (area-name (power-area power)))
+        (if (looking-for bar)
+            nil
+          (progn
+            (delete-line)
+            (insert bar)
+            (goto-bol)
+            (colorize power)
+            t))))))
 
 (defun beginning-of-bar (area-name &key clear)
   (goto-char (point-min))
