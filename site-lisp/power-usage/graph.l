@@ -193,7 +193,7 @@ http://setsuden.yahoo.co.jp/meter/index.html Ç‡éQè∆ÅB")
   t)
 
 (defun on-power-usage-update (power)
-  (if (find-buffer *power-usage-graph-buffer-name*)
+  (if (find-graph-buffer)
       (refresh-power-usage-graph power)
     (stop-auto-refresh-mode)))
 

@@ -31,6 +31,9 @@
 
 (in-package :power-usage)
 
+(defmacro find-graph-buffer ()
+  `(find-buffer *power-usage-graph-buffer-name*))
+
 (defmacro with-selected-buffer (buffer &body body)
   `(with-set-buffer
      (let ((#1=#:new ,buffer)
@@ -64,10 +67,23 @@
 (setf (get 'with-graph-buffer 'lisp-indent-hook) 0)
 
 (defmacro with-output-to-graph-buffer (&body body)
-  `(with-selected-window
-     (with-output-to-temp-buffer (*power-usage-graph-buffer-name*
-                                  *power-usage-graph-buffer-height*)
-       ,@body)))
+  `(with-output-to-temp-buffer (*power-usage-graph-buffer-name* nil)
+     (let ((#1=#:buffer (find-graph-buffer))
+           (#2=#:old (selected-buffer)))
+       (cond ((get-buffer-window #1#)
+              (with-selected-window
+                (set-window (get-buffer-window #1#))
+                ,@body))
+             (t
+              (split-window *power-usage-graph-buffer-height*)
+              (set-buffer #1#)
+              ,@body
+              (set-window (funcall (if (plusp *power-usage-graph-buffer-height*)
+                                       'next-window
+                                     'previous-window)
+                                   (selected-window)))
+              ))
+       )))
 (setf (get 'with-output-to-graph-buffer 'lisp-indent-hook) 0)
 
 
