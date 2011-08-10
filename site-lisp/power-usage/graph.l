@@ -206,7 +206,7 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 
 (defun init-power-usage-graph ()
   (with-output-to-graph-buffer
-    (refresh-screen) ; window-width を確定させるためここで一度レンダリング
+    (refresh-screen) ; window-columns を確定させるためここで一度レンダリング
     (insert #\SPC #\LFD)   ; あとで render-x-header するためのスペース
     (dolist (area (list-supported-area))
       (render-y-header (cdr area))
@@ -315,8 +315,7 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 (defun calc-graph-size ()
   (let* ((info-len (+ (length (format-y-axis ""))
                       (length (format-bar "" 0 0 0 0))))
-         (bar-len (- (window-width)
-                     4 ; なんかこのぐらい引かないと入りきらない
+         (bar-len (- (window-columns)
                      info-len)))
     ;; x-header が綺麗に揃うように 10 の倍数にする
     (* (floor (/ (max *power-usage-graph-min-size*
