@@ -116,7 +116,7 @@
 (defun update-mode-line-status (power manual-update-p)
   (let ((status (power-usage-status power))
         (long-status (power-usage-long-status power)))
-    (when status
+    (when (and status (string/= *mode-line* status))
       (setf *mode-line* status)
       (update-mode-line t)
       (refresh-screen))
