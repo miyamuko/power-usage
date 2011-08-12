@@ -57,9 +57,19 @@
     (:color 3 :usage 94)  ; 90% ～  94% の色
     (:color 5 :usage 96)  ; 95% ～  96% の色
     (:color 1 :usage 100) ; 97% 以上の色
-    (:color 15 :free t)   ; 電力未使用の領域の色
+    (:color 15 :free t)   ; 電力未使用領域の色
     )
-  "グラフの色の定義。
+  "グラフの色の定義。使用率と色をキーワードで指定する。
+
+  :usage 0          : 指定した使用率以下のグラフに設定する
+  :free nil         : 電力未使用領域の色を指定する場合 non-nil を指定する
+  :foreground 0     : グラフの文字色
+              1～15 : 文字1～文字15
+  :background 0     : グラフの背景色
+              1～15 : 背景1～背景15
+  :color      0     : グラフの文字色と背景色 (:background, :foreground がなければ利用)
+              1～15 : 文字1～文字15および背景1～背景15
+
 http://setsuden.yahoo.co.jp/meter/index.html も参照。")
 
 (defvar *power-usage-graph-buffer-name* "*Power Usage*"
@@ -288,12 +298,15 @@ http://setsuden.yahoo.co.jp/meter/index.html も参照。")
         (let ((color (car color/rate))
               (rate (cdr color/rate)))
           (unless (zerop rate)
-            (set-text-attribute start (+ start (calc-bar-length rate)) nil
-                                :foreground color :background color)))))))
+            (apply 'set-text-attribute start (+ start (calc-bar-length rate)) nil color)
+            ))))))
 
 (defun graph-colors (power)
   (mapcar #'(lambda (color)
-              (cons (getf color :color)
+              (cons (list :foreground (or (getf color :foreground)
+                                          (getf color :color))
+                          :background (or (getf color :background)
+                                          (getf color :color)))
                     (cond ((getf color :free)
                            100)
                           ((getf color :usage)
