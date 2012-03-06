@@ -54,7 +54,7 @@ xyzzy のモードラインに表示します。
     ; (setf power-usage:*power-usage-area* :chubu)
     ;; 九州電力
     ; (setf power-usage:*power-usage-area* :kyushu)
- 
+
     ;; ステータスバーに詳細情報を表示する
     ; (setf power-usage:*power-usage-enable-status-message* t)
     ```
@@ -86,7 +86,7 @@ xyzzy のモードラインに表示します。
 power-usage は MIT/X ライセンスに従って本ソフトウェアを使用、再配布することができます。
 
     Copyright (c) 2011-2012 MIYAMUKO Katsuyuki.
-  
+
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
     "Software"), to deal in the Software without restriction, including
@@ -94,10 +94,10 @@ power-usage は MIT/X ライセンスに従って本ソフトウェアを使用�
     distribute, sublicense, and/or sell copies of the Software, and to
     permit persons to whom the Software is furnished to do so, subject to
     the following conditions:
-  
+
     The above copyright notice and this permission notice shall be
     included in all copies or substantial portions of the Software.
-  
+
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
     MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
