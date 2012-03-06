@@ -1,24 +1,33 @@
-package: power-usage
+name: power-usage
 version: 1.3.2
+author: MIYAMUKO Katsuyuki
+src: http://miyamuko.s56.xrea.com/xyzzy/archives/power-usage.zip
+license: MIT/X
+notice:
+load-after-install:
+load-before-uninstall:
+
+depends:
+  - xml-http-request
+  - json
+
+category:
+  - Utilities
+
+short_description:
+  file: README.md
+  regex: "(?m)^# (.+)$"
+
+description:
+  file: README.md
+  regex: "(?sm)^## DESCRIPTION(.+?)(?:^## )"
+
+changes:
+  file: History.md
+  regex: "(?sm)^(## .+?)(?:^----)"
 
 sources:
   include:
     - site-lisp/power-usage/**/*.l
   exclude:
     - site-lisp/power-usage/**/tests/*.l
-
-document:
-  - README.rdoc
-
-depends:
-  - xml-http-request
-  - json
-
-files:
-  include:
-    - site-lisp/**/*.l
-    - site-lisp/**/*.lc
-    - site-lisp/power-usage/lib/*.dll
-    - site-lisp/power-usage/src/**/*.*
-    - site-lisp/power-usage/examples/**/*.*
-    - site-lisp/power-usage/tests/*.*
