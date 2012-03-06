@@ -85,7 +85,7 @@ xyzzy のモードラインに表示します。
 
 power-usage は MIT/X ライセンスに従って本ソフトウェアを使用、再配布することができます。
 
-    Copyright (c) 2011 MIYAMUKO Katsuyuki.
+    Copyright (c) 2011-2012 MIYAMUKO Katsuyuki.
   
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
