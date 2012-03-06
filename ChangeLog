@@ -1,3 +1,8 @@
+2012-03-06  MIYAMUKO Katsuyuki
+
+	* Yahoo 電力使用状況 API でいつの間にか中部電力の最新情報の取得が
+	できるようになっていたので対応
+
 2011-08-12  MIYAMUKO Katsuyuki
 
 	* power-uasge 1.3.2 リリース

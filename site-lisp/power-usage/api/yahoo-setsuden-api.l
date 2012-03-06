@@ -71,8 +71,7 @@
                 )))
 
 (defun build-api-endpoint-latest (area datetime)
-  ;; 中部電力は latest=1 を未サポート
-  (build-api-endpoint-impl area (cons :latest (if (eq area :chubu) 0 1))))
+  (build-api-endpoint-impl area '(:latest 1)))
 
 (defun build-api-endpoint-datetime (area datetime)
   (let ((datetime-str (apply 'format nil "~4,'0D~2,'0D~2,'0D~2,'0D" datetime)))
