@@ -11,7 +11,7 @@
 1. `*power-usage-area*` で地域を指定 (:tokyo, :tohoku, :kansai, :chubu, :kyusyu)
 2. `*power-usage-update-interval*` で監視間隔を秒単位で設定 (デフォルトは 300 秒 (5 分))
 3. `*power-usage-mode-line-format*` でモードラインをお好みで設定
-4. <tt>M-x power-usage-mode` でモードラインへの表示をトグル
+4. `M-x power-usage-mode` でモードラインへの表示をトグル
 
 グラフ表示:
 
@@ -26,6 +26,10 @@ xyzzy のモードラインに表示します。
 
 最新のデータは [Yahoo! 電力使用状況 API] から取得します。
 過去のデータは [東京電力電力供給状況 API] から取得します（東京電力のみ）。
+
+  [Yahoo! 電力使用状況 API]: http://developer.yahoo.co.jp/webapi/shinsai/setsuden/v1/latestpowerusage.html
+  [東京電力電力供給状況 API]: http://tepco-usage-api.appspot.com/
+
 
 ## INSTALL
 
@@ -108,8 +112,6 @@ power-usage は MIT/X ライセンスに従って本ソフトウェアを使用�
 
 
 
-  [Yahoo! 電力使用状況 API]: http://developer.yahoo.co.jp/webapi/shinsai/setsuden/v1/latestpowerusage.html
-  [東京電力電力供給状況 API]: http://tepco-usage-api.appspot.com/
   [NetInstaller]: http://www7a.biglobe.ne.jp/~hat/xyzzy/ni.html
   [GitHub Issues]: http://github.com/miyamuko/power-usage/issues
   [@miyamuko]: http://twitter.com/home?status=%40miyamuko%20%23xyzzy%20power-usage%3a%20
